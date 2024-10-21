@@ -25,13 +25,15 @@ public class A11yReporter {
         
         report += "Detailed Issues:\n"
         for (index, issue) in issues.enumerated() {
-            report += "\(index + 1). [\(issue.issueType)] \(issue.description)\n"
-            report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n\n"
+            if !type(of: issue.view).description().hasPrefix("_") {
+                report += "\(index + 1). [\(issue.issueType)] \(issue.description)\n"
+                report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n\n"
+            }
         }
         
         return report
     }
-    
+
     private static func auditViewController(_ viewController: UIViewController) -> [A11yIssue] {
         let voiceOverOptimizer = VoiceOverOptimizer()
         let dynamicTypeOptimizer = DynamicTypeOptimizer()
@@ -41,9 +43,11 @@ public class A11yReporter {
         var issues: [A11yIssue] = []
         
         func auditRecursively(_ view: UIView) {
-            issues.append(contentsOf: voiceOverOptimizer.audit(view))
-            issues.append(contentsOf: dynamicTypeOptimizer.audit(view, with: configuration))
-            issues.append(contentsOf: colorContrastOptimizer.audit(view, with: configuration))
+            if !type(of: view).description().hasPrefix("_") {
+                issues.append(contentsOf: voiceOverOptimizer.audit(view))
+                issues.append(contentsOf: dynamicTypeOptimizer.audit(view, with: configuration))
+                issues.append(contentsOf: colorContrastOptimizer.audit(view, with: configuration))
+            }
             
             for subview in view.subviews {
                 auditRecursively(subview)
