@@ -11,6 +11,14 @@ import UIKit
 class VoiceOverOptimizer {
     
     func optimize(_ view: UIView) {
+        optimizeView(view)
+        
+        for subview in view.subviews {
+            optimize(subview)
+        }
+    }
+    
+    private func optimizeView(_ view: UIView) {
         switch view {
         case let label as UILabel:
             optimizeLabel(label)
@@ -39,10 +47,6 @@ class VoiceOverOptimizer {
         }
         
         view.isAccessibilityElement = view.shouldBeAccessibilityElement()
-        
-        for subview in view.subviews {
-            optimize(subview)
-        }
     }
     
     private func optimizeLabel(_ label: UILabel) {
@@ -135,6 +139,18 @@ class VoiceOverOptimizer {
     func audit(_ view: UIView) -> [A11yIssue] {
         var issues: [A11yIssue] = []
         
+        issues.append(contentsOf: auditView(view))
+        
+        for subview in view.subviews {
+            issues.append(contentsOf: audit(subview))
+        }
+        
+        return issues
+    }
+    
+    private func auditView(_ view: UIView) -> [A11yIssue] {
+        var issues: [A11yIssue] = []
+        
         if view.isAccessibilityElement && view.accessibilityLabel == nil {
             issues.append(A11yIssue(view: view, issueType: .voiceOver, description: "Missing accessibility label"))
         }
@@ -162,10 +178,6 @@ class VoiceOverOptimizer {
             }
         default:
             break
-        }
-        
-        for subview in view.subviews {
-            issues.append(contentsOf: audit(subview))
         }
         
         return issues

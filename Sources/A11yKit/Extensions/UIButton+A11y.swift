@@ -10,9 +10,7 @@ import UIKit
 public extension UIButton {
     func a11y_optimizeForDynamicType() {
         titleLabel?.adjustsFontForContentSizeCategory = true
-        if let customFont = titleLabel?.font {
-            titleLabel?.font = UIFontMetrics.default.scaledFont(for: customFont)
-        }
+        titleLabel?.font = titleLabel?.font.map { UIFontMetrics.default.scaledFont(for: $0) }
     }
     
     func a11y_setAccessibleFont(style: UIFont.TextStyle = .body) {
@@ -24,15 +22,16 @@ public extension UIButton {
         guard let titleColor = titleColor(for: .normal),
               let backgroundColor = backgroundColor ?? superview?.backgroundColor else { return }
         
+        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio ?? 4.5 // WCAG AA
         let currentContrast = titleColor.contrastRatio(with: backgroundColor)
-        if currentContrast < A11yKit.shared.configuration.minimumContrastRatio {
-            let adjustedColor = titleColor.adjustedForContrast(against: backgroundColor, targetContrast: A11yKit.shared.configuration.minimumContrastRatio)
+        if currentContrast < minimumContrastRatio {
+            let adjustedColor = titleColor.adjustedForContrast(against: backgroundColor, targetContrast: minimumContrastRatio)
             setTitleColor(adjustedColor, for: .normal)
         }
     }
     
-    func a11y_makeAccessible(prefix: String = "", suffix: String = "") {
-        let buttonText = title(for: .normal) ?? ""
+    func a11y_makeAccessible(prefix: String = "", suffix: String = "", fallbackText: String = "Button") {
+        let buttonText = title(for: .normal) ?? fallbackText
         a11y_makeAccessible(label: prefix + buttonText + suffix, traits: .button)
     }
 }

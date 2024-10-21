@@ -11,6 +11,14 @@ import UIKit
 class DynamicTypeOptimizer {
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
+        optimizeView(view, with: configuration)
+        
+        for subview in view.subviews {
+            optimize(subview, with: configuration)
+        }
+    }
+    
+    private func optimizeView(_ view: UIView, with configuration: A11yConfiguration) {
         switch view {
         case let label as UILabel:
             optimizeLabel(label, with: configuration)
@@ -30,10 +38,6 @@ class DynamicTypeOptimizer {
             optimizeSearchBar(searchBar, with: configuration)
         default:
             optimizeGenericView(view, with: configuration)
-        }
-        
-        for subview in view.subviews {
-            optimize(subview, with: configuration)
         }
     }
     
@@ -74,13 +78,7 @@ class DynamicTypeOptimizer {
         
         if let customFont = textField.font {
             let fontDescriptor = customFont.fontDescriptor
-            let textStyle: UIFont.TextStyle = {
-                if let textStyle = fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle {
-                    return textStyle
-                } else {
-                    return .body
-                }
-            }()
+            let textStyle: UIFont.TextStyle = fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle ?? .body
             
             if let styleDescriptor = fontDescriptor.withDesign(.default)?.withSymbolicTraits(fontDescriptor.symbolicTraits) {
                 textField.font = UIFont(descriptor: styleDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
@@ -169,41 +167,49 @@ class DynamicTypeOptimizer {
     }
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
-        var issues: [A11yIssue] = []
-        
-        switch view {
-        case let label as UILabel:
-            if !label.adjustsFontForContentSizeCategory {
-                issues.append(A11yIssue(view: label, issueType: .dynamicType, description: "Label not adjusted for Dynamic Type"))
+            var issues: [A11yIssue] = []
+            
+            issues.append(contentsOf: auditView(view, with: configuration))
+            
+            for subview in view.subviews {
+                issues.append(contentsOf: audit(subview, with: configuration))
             }
-        case let button as UIButton:
-            if !(button.titleLabel?.adjustsFontForContentSizeCategory ?? false) {
-                issues.append(A11yIssue(view: button, issueType: .dynamicType, description: "Button title not adjusted for Dynamic Type"))
-            }
-        case let textField as UITextField:
-            if !textField.adjustsFontForContentSizeCategory {
-                issues.append(A11yIssue(view: textField, issueType: .dynamicType, description: "TextField not adjusted for Dynamic Type"))
-            }
-        case let textView as UITextView:
-            if !textView.adjustsFontForContentSizeCategory {
-                issues.append(A11yIssue(view: textView, issueType: .dynamicType, description: "TextView not adjusted for Dynamic Type"))
-            }
-        case let searchBar as UISearchBar:
-            if !searchBar.searchTextField.adjustsFontForContentSizeCategory {
-                issues.append(A11yIssue(view: searchBar, issueType: .dynamicType, description: "SearchBar not adjusted for Dynamic Type"))
-            }
-        default:
-            break
+            
+            return issues
         }
         
-        if configuration.enableLargeContentViewer && view.showsLargeContentViewer == false {
-            issues.append(A11yIssue(view: view, issueType: .dynamicType, description: "Large Content Viewer not enabled"))
+        private func auditView(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
+            var issues: [A11yIssue] = []
+            
+            switch view {
+            case let label as UILabel:
+                if !label.adjustsFontForContentSizeCategory {
+                    issues.append(A11yIssue(view: label, issueType: .dynamicType, description: "Label not adjusted for Dynamic Type"))
+                }
+            case let button as UIButton:
+                if !(button.titleLabel?.adjustsFontForContentSizeCategory ?? false) {
+                    issues.append(A11yIssue(view: button, issueType: .dynamicType, description: "Button title not adjusted for Dynamic Type"))
+                }
+            case let textField as UITextField:
+                if !textField.adjustsFontForContentSizeCategory {
+                    issues.append(A11yIssue(view: textField, issueType: .dynamicType, description: "TextField not adjusted for Dynamic Type"))
+                }
+            case let textView as UITextView:
+                if !textView.adjustsFontForContentSizeCategory {
+                    issues.append(A11yIssue(view: textView, issueType: .dynamicType, description: "TextView not adjusted for Dynamic Type"))
+                }
+            case let searchBar as UISearchBar:
+                if !searchBar.searchTextField.adjustsFontForContentSizeCategory {
+                    issues.append(A11yIssue(view: searchBar, issueType: .dynamicType, description: "SearchBar not adjusted for Dynamic Type"))
+                }
+            default:
+                break
+            }
+            
+            if configuration.enableLargeContentViewer && !view.showsLargeContentViewer {
+                issues.append(A11yIssue(view: view, issueType: .dynamicType, description: "Large Content Viewer not enabled"))
+            }
+            
+            return issues
         }
-        
-        for subview in view.subviews {
-            issues.append(contentsOf: audit(subview, with: configuration))
-        }
-        
-        return issues
-    }
 }
