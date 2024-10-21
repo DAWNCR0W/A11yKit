@@ -19,11 +19,17 @@ class DynamicTypeOptimizer {
             optimizeTextField(textField, with: configuration)
         }
     }
-    
+
     private func optimizeLabel(_ label: UILabel, with configuration: A11yConfiguration) {
         label.adjustsFontForContentSizeCategory = true
+        
         if let customFont = label.font {
-            label.font = UIFontMetrics.default.scaledFont(for: customFont)
+            if let textStyle = customFont.fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle {
+                label.font = UIFont.preferredFont(forTextStyle: textStyle)
+            } else {
+                let newFont = UIFont(descriptor: customFont.fontDescriptor, size: 0)
+                label.font = UIFontMetrics.default.scaledFont(for: newFont)
+            }
         } else {
             label.font = UIFont.preferredFont(forTextStyle: .body)
         }
@@ -48,8 +54,22 @@ class DynamicTypeOptimizer {
     
     private func optimizeTextField(_ textField: UITextField, with configuration: A11yConfiguration) {
         textField.adjustsFontForContentSizeCategory = true
+        
         if let customFont = textField.font {
-            textField.font = UIFontMetrics.default.scaledFont(for: customFont)
+            let fontDescriptor = customFont.fontDescriptor
+            let textStyle: UIFont.TextStyle = {
+                if let textStyle = fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle {
+                    return textStyle
+                } else {
+                    return .body
+                }
+            }()
+            
+            if let styleDescriptor = fontDescriptor.withDesign(.default)?.withSymbolicTraits(fontDescriptor.symbolicTraits) {
+                textField.font = UIFont(descriptor: styleDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
+            } else {
+                textField.font = UIFont(descriptor: fontDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
+            }
         } else {
             textField.font = UIFont.preferredFont(forTextStyle: .body)
         }

@@ -49,6 +49,10 @@ public class A11yKit {
     ///   - view: The view to optimize
     ///   - options: The optimization options to apply
     public func optimize(_ view: UIView, options: OptimizationOptions = .all) {
+        guard !type(of: view).description().hasPrefix("_") else {
+            return
+        }
+        
         if options.contains(.voiceOver) {
             voiceOverOptimizer.optimize(view)
         }

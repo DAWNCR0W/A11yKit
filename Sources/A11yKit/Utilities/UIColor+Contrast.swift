@@ -42,12 +42,29 @@ extension UIColor {
         
         let step: CGFloat = 0.05
         var adjustedColor = self
+        let maxIterations = 20
+        var iterations = 0
         
-        while adjustedColor.contrastRatio(with: backgroundColor) < targetContrast {
-            red = min(1, red + step)
-            green = min(1, green + step)
-            blue = min(1, blue + step)
+        while adjustedColor.contrastRatio(with: backgroundColor) < targetContrast && iterations < maxIterations {
+            let oldContrast = adjustedColor.contrastRatio(with: backgroundColor)
+            
+            if red < 1 {
+                red = min(1, red + step)
+            } else if green < 1 {
+                green = min(1, green + step)
+            } else if blue < 1 {
+                blue = min(1, blue + step)
+            } else {
+                break
+            }
+            
             adjustedColor = UIColor(red: red, green: green, blue: blue, alpha: alpha)
+            
+            if adjustedColor.contrastRatio(with: backgroundColor) <= oldContrast {
+                break
+            }
+            
+            iterations += 1
         }
         
         return adjustedColor
