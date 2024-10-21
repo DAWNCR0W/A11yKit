@@ -26,25 +26,22 @@ class ViewController: UIViewController {
         a11y.preferredContentSizeCategory = .large
         
         // Optimize with specific options
-        a11y.optimizeAll(self, options: [.voiceOver, .dynamicType])
+//        a11y.optimizeAll(self, options: [.voiceOver, .dynamicType])
         
         // Optimize a specific view
         if let specialView = view.viewWithTag(100) {
             a11y.optimizeColorContrast(for: specialView)
         }
         
+        a11y.optimize(testLabel)
+//        a11y.optimize(testButton)
+        a11y.optimize(testTextField)
+        a11y.optimize(testImageView)
+        a11y.optimize(testView)
+        
         // Generate an accessibility report
         let report = a11y.generateAccessibilityReport(for: self)
         print(report)
-        
-        print("----")
-        
-        a11y.optimizeAll(self)
-        
-        let reportAfter = a11y.generateAccessibilityReport(for: self)
-        print(reportAfter)
     }
-
-
 }
 
