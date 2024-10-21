@@ -8,6 +8,10 @@
 import Foundation
 import UIKit
 
+public enum A11yInfo {
+    public static let version = "0.1.0"
+}
+
 @MainActor
 public class A11yKit {
     // MARK: - Singleton
