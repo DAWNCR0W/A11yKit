@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 class VoiceOverOptimizer {
     
     func optimize(_ view: UIView) {

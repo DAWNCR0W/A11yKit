@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public class A11yReporter {
     private init() {}
     

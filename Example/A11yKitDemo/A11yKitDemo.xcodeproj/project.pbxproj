@@ -6,6 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A84079132CC6240400BF09BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A840790A2CC6240400BF09BA /* Assets.xcassets */; };
+		A84079152CC6240400BF09BA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A840790D2CC6240400BF09BA /* LaunchScreen.storyboard */; };
+		A84079162CC6240400BF09BA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A840790F2CC6240400BF09BA /* Main.storyboard */; };
+		A84079172CC6240400BF09BA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84079092CC6240400BF09BA /* AppDelegate.swift */; };
+		A84079182CC6240400BF09BA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84079102CC6240400BF09BA /* SceneDelegate.swift */; };
+		A84079192CC6240400BF09BA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84079112CC6240400BF09BA /* ViewController.swift */; };
+		A840791C2CC6240700BF09BA /* A11yKitDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A840791A2CC6240700BF09BA /* A11yKitDemoTests.swift */; };
+		A84079202CC6240A00BF09BA /* A11yKitDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A840791D2CC6240A00BF09BA /* A11yKitDemoUITests.swift */; };
+		A84079212CC6240A00BF09BA /* A11yKitDemoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A840791E2CC6240A00BF09BA /* A11yKitDemoUITestsLaunchTests.swift */; };
+		A84079242CC6242C00BF09BA /* A11yKit in Frameworks */ = {isa = PBXBuildFile; productRef = A84079232CC6242C00BF09BA /* A11yKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A84078D62CC6238B00BF09BA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,44 +40,24 @@
 		A84078BF2CC6238A00BF09BA /* A11yKitDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = A11yKitDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A84078D52CC6238B00BF09BA /* A11yKitDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = A11yKitDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A84078DF2CC6238B00BF09BA /* A11yKitDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = A11yKitDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A84079092CC6240400BF09BA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A840790A2CC6240400BF09BA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A840790B2CC6240400BF09BA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A840790C2CC6240400BF09BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A840790E2CC6240400BF09BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A84079102CC6240400BF09BA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		A84079112CC6240400BF09BA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A840791A2CC6240700BF09BA /* A11yKitDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = A11yKitDemoTests.swift; sourceTree = "<group>"; };
+		A840791D2CC6240A00BF09BA /* A11yKitDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = A11yKitDemoUITests.swift; sourceTree = "<group>"; };
+		A840791E2CC6240A00BF09BA /* A11yKitDemoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = A11yKitDemoUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A84078E72CC6238B00BF09BA /* Exceptions for "A11yKitDemo" folder in "A11yKitDemo" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = A84078BE2CC6238A00BF09BA /* A11yKitDemo */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		A84078C12CC6238A00BF09BA /* A11yKitDemo */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A84078E72CC6238B00BF09BA /* Exceptions for "A11yKitDemo" folder in "A11yKitDemo" target */,
-			);
-			path = A11yKitDemo;
-			sourceTree = "<group>";
-		};
-		A84078D82CC6238B00BF09BA /* A11yKitDemoTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = A11yKitDemoTests;
-			sourceTree = "<group>";
-		};
-		A84078E22CC6238B00BF09BA /* A11yKitDemoUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = A11yKitDemoUITests;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A84078BC2CC6238A00BF09BA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A84079242CC6242C00BF09BA /* A11yKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,9 +81,9 @@
 		A84078B62CC6238A00BF09BA = {
 			isa = PBXGroup;
 			children = (
-				A84078C12CC6238A00BF09BA /* A11yKitDemo */,
-				A84078D82CC6238B00BF09BA /* A11yKitDemoTests */,
-				A84078E22CC6238B00BF09BA /* A11yKitDemoUITests */,
+				A84079122CC6240400BF09BA /* A11yKitDemo */,
+				A840791B2CC6240700BF09BA /* A11yKitDemoTests */,
+				A840791F2CC6240A00BF09BA /* A11yKitDemoUITests */,
 				A84078C02CC6238A00BF09BA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -103,6 +96,37 @@
 				A84078DF2CC6238B00BF09BA /* A11yKitDemoUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A84079122CC6240400BF09BA /* A11yKitDemo */ = {
+			isa = PBXGroup;
+			children = (
+				A84079092CC6240400BF09BA /* AppDelegate.swift */,
+				A840790A2CC6240400BF09BA /* Assets.xcassets */,
+				A840790B2CC6240400BF09BA /* Info.plist */,
+				A840790D2CC6240400BF09BA /* LaunchScreen.storyboard */,
+				A840790F2CC6240400BF09BA /* Main.storyboard */,
+				A84079102CC6240400BF09BA /* SceneDelegate.swift */,
+				A84079112CC6240400BF09BA /* ViewController.swift */,
+			);
+			path = A11yKitDemo;
+			sourceTree = "<group>";
+		};
+		A840791B2CC6240700BF09BA /* A11yKitDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				A840791A2CC6240700BF09BA /* A11yKitDemoTests.swift */,
+			);
+			path = A11yKitDemoTests;
+			sourceTree = "<group>";
+		};
+		A840791F2CC6240A00BF09BA /* A11yKitDemoUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A840791D2CC6240A00BF09BA /* A11yKitDemoUITests.swift */,
+				A840791E2CC6240A00BF09BA /* A11yKitDemoUITestsLaunchTests.swift */,
+			);
+			path = A11yKitDemoUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -120,11 +144,9 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				A84078C12CC6238A00BF09BA /* A11yKitDemo */,
-			);
 			name = A11yKitDemo;
 			packageProductDependencies = (
+				A84079232CC6242C00BF09BA /* A11yKit */,
 			);
 			productName = A11yKitDemo;
 			productReference = A84078BF2CC6238A00BF09BA /* A11yKitDemo.app */;
@@ -142,9 +164,6 @@
 			);
 			dependencies = (
 				A84078D72CC6238B00BF09BA /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A84078D82CC6238B00BF09BA /* A11yKitDemoTests */,
 			);
 			name = A11yKitDemoTests;
 			packageProductDependencies = (
@@ -165,9 +184,6 @@
 			);
 			dependencies = (
 				A84078E12CC6238B00BF09BA /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A84078E22CC6238B00BF09BA /* A11yKitDemoUITests */,
 			);
 			name = A11yKitDemoUITests;
 			packageProductDependencies = (
@@ -208,6 +224,9 @@
 			);
 			mainGroup = A84078B62CC6238A00BF09BA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A84079222CC6242C00BF09BA /* XCLocalSwiftPackageReference "../../../A11yKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A84078C02CC6238A00BF09BA /* Products */;
 			projectDirPath = "";
@@ -225,6 +244,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A84079132CC6240400BF09BA /* Assets.xcassets in Resources */,
+				A84079152CC6240400BF09BA /* LaunchScreen.storyboard in Resources */,
+				A84079162CC6240400BF09BA /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +271,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A84079172CC6240400BF09BA /* AppDelegate.swift in Sources */,
+				A84079182CC6240400BF09BA /* SceneDelegate.swift in Sources */,
+				A84079192CC6240400BF09BA /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +281,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A840791C2CC6240700BF09BA /* A11yKitDemoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +289,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A84079202CC6240A00BF09BA /* A11yKitDemoUITests.swift in Sources */,
+				A84079212CC6240A00BF09BA /* A11yKitDemoUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +309,25 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		A840790D2CC6240400BF09BA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A840790C2CC6240400BF09BA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		A840790F2CC6240400BF09BA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A840790E2CC6240400BF09BA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		A84078E92CC6238B00BF09BA /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -297,6 +344,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -325,6 +373,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -569,6 +618,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A84079222CC6242C00BF09BA /* XCLocalSwiftPackageReference "../../../A11yKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../A11yKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A84079232CC6242C00BF09BA /* A11yKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = A11yKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A84078B72CC6238A00BF09BA /* Project object */;
 }

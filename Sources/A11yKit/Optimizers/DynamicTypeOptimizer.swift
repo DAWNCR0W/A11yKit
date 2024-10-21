@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 class DynamicTypeOptimizer {
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {

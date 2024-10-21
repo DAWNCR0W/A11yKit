@@ -14,6 +14,7 @@ public enum LogLevel: Int {
     case error
 }
 
+@MainActor
 public class A11yLogger {
     public static var isEnabled = true
     public static var minimumLogLevel: LogLevel = .info

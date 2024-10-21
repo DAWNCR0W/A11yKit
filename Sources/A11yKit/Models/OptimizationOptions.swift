@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct OptimizationOptions: OptionSet {
+public struct OptimizationOptions: OptionSet, Sendable {
     public let rawValue: Int
     
     public static let voiceOver = OptimizationOptions(rawValue: 1 << 0)

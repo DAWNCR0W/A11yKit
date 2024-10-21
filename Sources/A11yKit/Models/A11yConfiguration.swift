@@ -22,6 +22,7 @@ public struct A11yConfiguration {
     public var minimumContentSizeCategory: UIContentSizeCategory = .small
     public var maximumContentSizeCategory: UIContentSizeCategory = .accessibilityExtraExtraExtraLarge
     public var enableLargeContentViewer: Bool = true
+    public var preferredContentSizeCategory: UIContentSizeCategory? = nil
     
     // MARK: - Color Contrast Settings
     public var enableColorContrastOptimization: Bool = true
@@ -58,6 +59,7 @@ extension A11yConfiguration: CustomStringConvertible {
         - Log Level: \(logLevel)
         - Auto Generate VoiceOver Labels: \(autoGenerateVoiceOverLabels)
         - Enable Dynamic Type: \(enableDynamicType)
+        - Preferred Content Size Category: \(preferredContentSizeCategory?.rawValue ?? "nil")
         - Enable Color Contrast Optimization: \(enableColorContrastOptimization)
         - Minimum Contrast Ratio: \(minimumContrastRatio)
         - Custom Settings: \(customSettings)

@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 public class A11yKit {
     // MARK: - Singleton
     public static let shared = A11yKit()
@@ -15,6 +16,22 @@ public class A11yKit {
     
     // MARK: - Configuration
     public var configuration = A11yConfiguration()
+    
+    // MARK: - Properties
+    public var isLoggingEnabled: Bool {
+        get { return A11yLogger.isEnabled }
+        set { A11yLogger.isEnabled = newValue }
+    }
+    
+    public var minimumContrastRatio: CGFloat {
+        get { return configuration.minimumContrastRatio }
+        set { configuration.minimumContrastRatio = newValue }
+    }
+    
+    public var preferredContentSizeCategory: UIContentSizeCategory? {
+        get { return configuration.preferredContentSizeCategory }
+        set { configuration.preferredContentSizeCategory = newValue }
+    }
     
     // MARK: - Optimizers
     private let voiceOverOptimizer = VoiceOverOptimizer()
@@ -132,8 +149,22 @@ public class A11yKit {
     /// Enables or disables logging
     /// - Parameter enabled: Whether logging should be enabled
     public func setLoggingEnabled(_ enabled: Bool) {
-        A11yLogger.isEnabled = enabled
+        isLoggingEnabled = enabled
         A11yLogger.log("Logging \(enabled ? "enabled" : "disabled")", level: .info)
+    }
+    
+    /// Sets the minimum contrast ratio
+    /// - Parameter ratio: The minimum contrast ratio to set
+    public func setMinimumContrastRatio(_ ratio: CGFloat) {
+        minimumContrastRatio = ratio
+        A11yLogger.log("Set minimum contrast ratio to \(ratio)", level: .info)
+    }
+    
+    /// Sets the preferred content size category
+    /// - Parameter category: The preferred content size category to set
+    public func setPreferredContentSizeCategory(_ category: UIContentSizeCategory?) {
+        configuration.preferredContentSizeCategory = category
+        A11yLogger.log("Set preferred content size category to \(category?.rawValue ?? "nil")", level: .info)
     }
 }
 

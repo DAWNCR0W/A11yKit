@@ -28,7 +28,7 @@ You can install A11yKit using the [Swift Package Manager](https://swift.org/pack
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/A11yKit.git", from: "1.0.0")
+    .package(url: "https://github.com/DAWNCR0W/A11yKit.git", from: "1.0.0")
 ]
 ```
 
