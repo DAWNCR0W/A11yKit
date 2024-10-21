@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 public enum A11yInfo {
-    public static let version = "0.1.0"
+    public static let version = "0.1.1"
 }
 
 @MainActor
