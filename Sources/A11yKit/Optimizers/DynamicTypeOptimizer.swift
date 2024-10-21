@@ -19,11 +19,12 @@ class DynamicTypeOptimizer {
             optimizeTextField(textField, with: configuration)
         }
     }
-    
+
     private func optimizeLabel(_ label: UILabel, with configuration: A11yConfiguration) {
         label.adjustsFontForContentSizeCategory = true
+        
         if let customFont = label.font {
-            label.font = UIFontMetrics.default.scaledFont(for: customFont)
+            label.font = scaledFontIfNeeded(customFont)
         } else {
             label.font = UIFont.preferredFont(forTextStyle: .body)
         }
@@ -79,5 +80,13 @@ class DynamicTypeOptimizer {
         }
         
         return issues
+    }
+    
+    private func scaledFontIfNeeded(_ font: UIFont) -> UIFont {
+        if font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
+            return font
+        } else {
+            return UIFontMetrics.default.scaledFont(for: font)
+        }
     }
 }
