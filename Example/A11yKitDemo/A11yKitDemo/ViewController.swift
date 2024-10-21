@@ -23,27 +23,34 @@ class ViewController: UIViewController {
         // Configure A11yKit
         a11y.isLoggingEnabled = true
         a11y.minimumContrastRatio = 7.0 // WCAG AAA standard
-        a11y.preferredContentSizeCategory = .large
+        a11y.setPreferredContentSizeCategory(.large)
         
         // Optimize with specific options
-        a11y.optimizeAll(self, options: [.voiceOver, .dynamicType])
+        a11y.optimizeAll(self, options: [.voiceOver, .dynamicType, .colorContrast])
         
         // Optimize a specific view
         if let specialView = view.viewWithTag(100) {
             a11y.optimizeColorContrast(for: specialView)
         }
         
-        a11y.optimizeAll(self)
-        
-        a11y.optimize(testLabel)
-        a11y.optimize(testButton)
-        a11y.optimize(testTextField)
-        a11y.optimize(testImageView)
-        a11y.optimize(testView)
-        
         // Generate an accessibility report
         let report = a11y.generateAccessibilityReport(for: self)
         print(report)
+        
+        // Perform an accessibility audit
+        let issues = a11y.performAccessibilityAudit(on: self)
+        print("Found \(issues.count) accessibility issues")
+        
+        // Undo last optimization
+        a11y.undoLastOptimization()
+        
+        // Get diagnostic information
+        let diagnosticInfo = a11y.getDiagnosticInfo()
+        print(diagnosticInfo)
+    }
+    
+    func optimizeAsync() async {
+        await A11yKit.shared.optimizeAsync(view)
     }
 }
 
