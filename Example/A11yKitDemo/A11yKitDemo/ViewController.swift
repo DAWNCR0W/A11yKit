@@ -36,6 +36,13 @@ class ViewController: UIViewController {
         // Generate an accessibility report
         let report = a11y.generateAccessibilityReport(for: self)
         print(report)
+        
+        print("----")
+        
+        a11y.optimizeAll(self)
+        
+        let reportAfter = a11y.generateAccessibilityReport(for: self)
+        print(reportAfter)
     }
 
 
