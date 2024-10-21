@@ -25,11 +25,11 @@ public class A11yReporter {
         
         report += "Detailed Issues:\n"
         for (index, issue) in issues.enumerated() {
-            if !type(of: issue.view).description().hasPrefix("_") {
-                report += "\(index + 1). [\(issue.issueType)] \(issue.description)\n"
-                report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n\n"
-            }
+            report += "\(index + 1). [\(issue.issueType)] \(issue.description)\n"
+            report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n\n"
         }
+        
+        A11yLogger.info("Generated accessibility report for \(type(of: viewController))")
         
         return report
     }
@@ -43,11 +43,9 @@ public class A11yReporter {
         var issues: [A11yIssue] = []
         
         func auditRecursively(_ view: UIView) {
-            if !type(of: view).description().hasPrefix("_") {
-                issues.append(contentsOf: voiceOverOptimizer.audit(view))
-                issues.append(contentsOf: dynamicTypeOptimizer.audit(view, with: configuration))
-                issues.append(contentsOf: colorContrastOptimizer.audit(view, with: configuration))
-            }
+            issues.append(contentsOf: voiceOverOptimizer.audit(view))
+            issues.append(contentsOf: dynamicTypeOptimizer.audit(view, with: configuration))
+            issues.append(contentsOf: colorContrastOptimizer.audit(view, with: configuration))
             
             for subview in view.subviews {
                 auditRecursively(subview)
@@ -55,6 +53,16 @@ public class A11yReporter {
         }
         
         auditRecursively(viewController.view)
-        return issues
+        
+        A11yLogger.debug("Audited \(viewController.view.subviews.count) subviews in \(type(of: viewController))")
+        
+        var uniqueIssues: [A11yIssue] = []
+        for issue in issues {
+            if !uniqueIssues.contains(where: { $0.view === issue.view && $0.issueType == issue.issueType }) {
+                uniqueIssues.append(issue)
+            }
+        }
+        
+        return uniqueIssues
     }
 }
