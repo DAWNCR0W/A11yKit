@@ -9,7 +9,12 @@ import UIKit
 import A11yKit
 
 class ViewController: UIViewController {
-
+    @IBOutlet var testLabel: UILabel!
+    @IBOutlet var testButton: UIButton!
+    @IBOutlet var testTextField: UITextField!
+    @IBOutlet var testImageView: UIImageView!
+    @IBOutlet var testView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

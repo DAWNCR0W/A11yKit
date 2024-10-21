@@ -24,7 +24,12 @@ class DynamicTypeOptimizer {
         label.adjustsFontForContentSizeCategory = true
         
         if let customFont = label.font {
-            label.font = scaledFontIfNeeded(customFont)
+            if let textStyle = customFont.fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle {
+                label.font = UIFont.preferredFont(forTextStyle: textStyle)
+            } else {
+                let newFont = UIFont(descriptor: customFont.fontDescriptor, size: 0)
+                label.font = UIFontMetrics.default.scaledFont(for: newFont)
+            }
         } else {
             label.font = UIFont.preferredFont(forTextStyle: .body)
         }
@@ -80,13 +85,5 @@ class DynamicTypeOptimizer {
         }
         
         return issues
-    }
-    
-    private func scaledFontIfNeeded(_ font: UIFont) -> UIFont {
-        if font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
-            return font
-        } else {
-            return UIFontMetrics.default.scaledFont(for: font)
-        }
     }
 }
