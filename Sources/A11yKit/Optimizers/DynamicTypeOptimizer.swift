@@ -54,8 +54,22 @@ class DynamicTypeOptimizer {
     
     private func optimizeTextField(_ textField: UITextField, with configuration: A11yConfiguration) {
         textField.adjustsFontForContentSizeCategory = true
+        
         if let customFont = textField.font {
-            textField.font = UIFontMetrics.default.scaledFont(for: customFont)
+            let fontDescriptor = customFont.fontDescriptor
+            let textStyle: UIFont.TextStyle = {
+                if let textStyle = fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle {
+                    return textStyle
+                } else {
+                    return .body
+                }
+            }()
+            
+            if let styleDescriptor = fontDescriptor.withDesign(.default)?.withSymbolicTraits(fontDescriptor.symbolicTraits) {
+                textField.font = UIFont(descriptor: styleDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
+            } else {
+                textField.font = UIFont(descriptor: fontDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
+            }
         } else {
             textField.font = UIFont.preferredFont(forTextStyle: .body)
         }
