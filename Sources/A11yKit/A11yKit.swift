@@ -42,6 +42,9 @@ public class A11yKit {
     private let dynamicTypeOptimizer = DynamicTypeOptimizer()
     private let colorContrastOptimizer = ColorContrastOptimizer()
     
+    // MARK: - Undo stack
+    private var optimizationStack: [(UIView, OptimizationOptions)] = []
+    
     // MARK: - Main Optimization Methods
     
     /// Optimizes a single view for accessibility
@@ -63,6 +66,14 @@ public class A11yKit {
             colorContrastOptimizer.optimize(view, with: configuration)
         }
         A11yLogger.log("Optimized \(type(of: view))", level: .info)
+        
+        optimizationStack.append((view, options))
+    }
+    
+    public func optimizeAsync(_ view: UIView, options: OptimizationOptions = .all) async {
+        await Task { @MainActor in
+            self.optimize(view, options: options)
+        }.value
     }
     
     /// Optimizes all views in a view controller
@@ -173,6 +184,23 @@ public class A11yKit {
     public func setPreferredContentSizeCategory(_ category: UIContentSizeCategory?) {
         configuration.preferredContentSizeCategory = category
         A11yLogger.log("Set preferred content size category to \(category?.rawValue ?? "nil")", level: .info)
+    }
+    
+    // MARK: - Undo Methods
+    public func undoLastOptimization() {
+        guard let (view, options) = optimizationStack.popLast() else { return }
+        resetAccessibilityProperties(for: view)
+        A11yLogger.log("Undid last optimization for \(type(of: view))", level: .info)
+    }
+    
+    // MARK: - Diagnostic Info
+    public func getDiagnosticInfo() -> String {
+        return """
+            A11yKit Diagnostic Info:
+            Version: \(A11yInfo.version)
+            Configuration: \(configuration)
+            Optimized Views: \(optimizationStack.count)
+            """
     }
 }
 
