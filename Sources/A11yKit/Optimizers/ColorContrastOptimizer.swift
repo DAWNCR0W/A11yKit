@@ -11,6 +11,14 @@ import UIKit
 class ColorContrastOptimizer {
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
+        optimizeView(view, with: configuration)
+        
+        for subview in view.subviews {
+            optimize(subview, with: configuration)
+        }
+    }
+    
+    private func optimizeView(_ view: UIView, with configuration: A11yConfiguration) {
         switch view {
         case let label as UILabel:
             optimizeLabel(label, with: configuration)
@@ -27,111 +35,60 @@ class ColorContrastOptimizer {
         default:
             break
         }
-        
-        for subview in view.subviews {
-            optimize(subview, with: configuration)
-        }
     }
     
     private func optimizeLabel(_ label: UILabel, with configuration: A11yConfiguration) {
-        guard let backgroundColor = label.backgroundColor ?? label.superview?.backgroundColor else { return }
-        let currentContrast = label.textColor.contrastRatio(with: backgroundColor)
-        
-        if currentContrast < configuration.minimumContrastRatio {
-            label.textColor = label.textColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
-        }
+        let backgroundColor = getBackgroundColor(label)
+        let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: label.textColor, backgroundColor: backgroundColor, configuration: configuration)
+        label.textColor = adjustedColor
     }
     
     private func optimizeButton(_ button: UIButton, with configuration: A11yConfiguration) {
-        guard let titleColor = button.titleColor(for: .normal),
-              let backgroundColor = button.backgroundColor ?? button.superview?.backgroundColor else { return }
-        
-        let currentContrast = titleColor.contrastRatio(with: backgroundColor)
-        
-        if currentContrast < configuration.minimumContrastRatio {
-            var adjustedColor = titleColor
-            var attempts = 0
-            while adjustedColor.contrastRatio(with: backgroundColor) < configuration.minimumContrastRatio && attempts < 10 {
-                adjustedColor = adjustedColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
-                attempts += 1
-            }
-            
+        let backgroundColor = getBackgroundColor(button)
+        if let titleColor = button.titleColor(for: .normal) {
+            let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: titleColor, backgroundColor: backgroundColor, configuration: configuration)
             button.setTitleColor(adjustedColor, for: .normal)
-            
-            let newContrast = adjustedColor.contrastRatio(with: backgroundColor)
         }
     }
     
     private func optimizeTextField(_ textField: UITextField, with configuration: A11yConfiguration) {
-        guard let textColor = textField.textColor,
-              let backgroundColor = textField.backgroundColor ?? textField.superview?.backgroundColor else { return }
-        
-        let currentContrast = textColor.contrastRatio(with: backgroundColor)
-        
-        if currentContrast < configuration.minimumContrastRatio {
-            textField.textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
+        let backgroundColor = getBackgroundColor(textField)
+        if let textColor = textField.textColor {
+            let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+            textField.textColor = adjustedColor
         }
     }
     
     private func optimizeTextView(_ textView: UITextView, with configuration: A11yConfiguration) {
-        guard let textColor = textView.textColor,
-              let backgroundColor = textView.backgroundColor ?? textView.superview?.backgroundColor else { return }
-        
-        let currentContrast = textColor.contrastRatio(with: backgroundColor)
-        
-        if currentContrast < configuration.minimumContrastRatio {
-            textView.textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
+        let backgroundColor = getBackgroundColor(textView)
+        if let textColor = textView.textColor {
+            let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+            textView.textColor = adjustedColor
         }
     }
     
     private func optimizeSegmentedControl(_ segmentedControl: UISegmentedControl, with configuration: A11yConfiguration) {
-        guard let backgroundColor = segmentedControl.backgroundColor ?? segmentedControl.superview?.backgroundColor else { return }
-        
+        let backgroundColor = getBackgroundColor(segmentedControl)
         for state in [UIControl.State.normal, .selected] {
-            if let titleTextAttributes = segmentedControl.titleTextAttributes(for: state),
+            if var titleTextAttributes = segmentedControl.titleTextAttributes(for: state),
                let textColor = titleTextAttributes[.foregroundColor] as? UIColor {
-                let currentContrast = textColor.contrastRatio(with: backgroundColor)
-                
-                if currentContrast < configuration.minimumContrastRatio {
-                    let adjustedColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
-                    var newAttributes = titleTextAttributes
-                    newAttributes[.foregroundColor] = adjustedColor
-                    segmentedControl.setTitleTextAttributes(newAttributes, for: state)
-                }
+                let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+                titleTextAttributes[.foregroundColor] = adjustedColor
+                segmentedControl.setTitleTextAttributes(titleTextAttributes, for: state)
             }
         }
     }
     
     private func optimizeSearchBar(_ searchBar: UISearchBar, with configuration: A11yConfiguration) {
-        guard let textColor = searchBar.searchTextField.textColor,
-              let backgroundColor = searchBar.searchTextField.backgroundColor ?? searchBar.backgroundColor ?? searchBar.superview?.backgroundColor else { return }
-        
-        let currentContrast = textColor.contrastRatio(with: backgroundColor)
-        
-        if currentContrast < configuration.minimumContrastRatio {
-            searchBar.searchTextField.textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
+        let backgroundColor = getBackgroundColor(searchBar.searchTextField)
+        if let textColor = searchBar.searchTextField.textColor {
+            let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+            searchBar.searchTextField.textColor = adjustedColor
         }
     }
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
-        var issues: [A11yIssue] = []
-        
-        switch view {
-        case let label as UILabel:
-            issues.append(contentsOf: auditLabel(label, with: configuration))
-        case let button as UIButton:
-            issues.append(contentsOf: auditButton(button, with: configuration))
-        case let textField as UITextField:
-            issues.append(contentsOf: auditTextField(textField, with: configuration))
-        case let textView as UITextView:
-            issues.append(contentsOf: auditTextView(textView, with: configuration))
-        case let segmentedControl as UISegmentedControl:
-            issues.append(contentsOf: auditSegmentedControl(segmentedControl, with: configuration))
-        case let searchBar as UISearchBar:
-            issues.append(contentsOf: auditSearchBar(searchBar, with: configuration))
-        default:
-            break
-        }
+        var issues = auditView(view, with: configuration)
         
         for subview in view.subviews {
             issues.append(contentsOf: audit(subview, with: configuration))
@@ -140,9 +97,28 @@ class ColorContrastOptimizer {
         return issues
     }
     
+    private func auditView(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
+        switch view {
+        case let label as UILabel:
+            return auditLabel(label, with: configuration)
+        case let button as UIButton:
+            return auditButton(button, with: configuration)
+        case let textField as UITextField:
+            return auditTextField(textField, with: configuration)
+        case let textView as UITextView:
+            return auditTextView(textView, with: configuration)
+        case let segmentedControl as UISegmentedControl:
+            return auditSegmentedControl(segmentedControl, with: configuration)
+        case let searchBar as UISearchBar:
+            return auditSearchBar(searchBar, with: configuration)
+        default:
+            return []
+        }
+    }
+    
     private func auditLabel(_ label: UILabel, with configuration: A11yConfiguration) -> [A11yIssue] {
-        guard let backgroundColor = label.backgroundColor ?? label.superview?.backgroundColor else { return [] }
-        let contrast = label.textColor.contrastRatio(with: backgroundColor)
+        let backgroundColor = getBackgroundColor(label)
+        let (_, contrast) = checkAndAdjustContrast(foregroundColor: label.textColor, backgroundColor: backgroundColor, configuration: configuration)
         if contrast < configuration.minimumContrastRatio {
             return [A11yIssue(view: label, issueType: .colorContrast, description: "Insufficient color contrast for label: \(contrast)")]
         }
@@ -150,45 +126,46 @@ class ColorContrastOptimizer {
     }
     
     private func auditButton(_ button: UIButton, with configuration: A11yConfiguration) -> [A11yIssue] {
-        guard let titleColor = button.titleColor(for: .normal),
-              let backgroundColor = button.backgroundColor ?? button.superview?.backgroundColor else { return [] }
-        
-        let contrast = titleColor.contrastRatio(with: backgroundColor)
-        if contrast < configuration.minimumContrastRatio {
-            let issue = A11yIssue(view: button, issueType: .colorContrast, description: "Insufficient color contrast for button: \(contrast)")
-            return [issue]
+        let backgroundColor = getBackgroundColor(button)
+        if let titleColor = button.titleColor(for: .normal) {
+            let (_, contrast) = checkAndAdjustContrast(foregroundColor: titleColor, backgroundColor: backgroundColor, configuration: configuration)
+            if contrast < configuration.minimumContrastRatio {
+                return [A11yIssue(view: button, issueType: .colorContrast, description: "Insufficient color contrast for button: \(contrast)")]
+            }
         }
         return []
     }
     
     private func auditTextField(_ textField: UITextField, with configuration: A11yConfiguration) -> [A11yIssue] {
-        guard let textColor = textField.textColor,
-              let backgroundColor = textField.backgroundColor ?? textField.superview?.backgroundColor else { return [] }
-        let contrast = textColor.contrastRatio(with: backgroundColor)
-        if contrast < configuration.minimumContrastRatio {
-            return [A11yIssue(view: textField, issueType: .colorContrast, description: "Insufficient color contrast for text field: \(contrast)")]
+        let backgroundColor = getBackgroundColor(textField)
+        if let textColor = textField.textColor {
+            let (_, contrast) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+            if contrast < configuration.minimumContrastRatio {
+                return [A11yIssue(view: textField, issueType: .colorContrast, description: "Insufficient color contrast for text field: \(contrast)")]
+            }
         }
         return []
     }
     
     private func auditTextView(_ textView: UITextView, with configuration: A11yConfiguration) -> [A11yIssue] {
-        guard let textColor = textView.textColor,
-              let backgroundColor = textView.backgroundColor ?? textView.superview?.backgroundColor else { return [] }
-        let contrast = textColor.contrastRatio(with: backgroundColor)
-        if contrast < configuration.minimumContrastRatio {
-            return [A11yIssue(view: textView, issueType: .colorContrast, description: "Insufficient color contrast for text view: \(contrast)")]
+        let backgroundColor = getBackgroundColor(textView)
+        if let textColor = textView.textColor {
+            let (_, contrast) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+            if contrast < configuration.minimumContrastRatio {
+                return [A11yIssue(view: textView, issueType: .colorContrast, description: "Insufficient color contrast for text view: \(contrast)")]
+            }
         }
         return []
     }
     
     private func auditSegmentedControl(_ segmentedControl: UISegmentedControl, with configuration: A11yConfiguration) -> [A11yIssue] {
         var issues: [A11yIssue] = []
-        guard let backgroundColor = segmentedControl.backgroundColor ?? segmentedControl.superview?.backgroundColor else { return [] }
+        let backgroundColor = getBackgroundColor(segmentedControl)
         
         for state in [UIControl.State.normal, .selected] {
             if let titleTextAttributes = segmentedControl.titleTextAttributes(for: state),
                let textColor = titleTextAttributes[.foregroundColor] as? UIColor {
-                let contrast = textColor.contrastRatio(with: backgroundColor)
+                let (_, contrast) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
                 if contrast < configuration.minimumContrastRatio {
                     issues.append(A11yIssue(view: segmentedControl, issueType: .colorContrast, description: "Insufficient color contrast for segmented control (\(state == .normal ? "normal" : "selected") state): \(contrast)"))
                 }
@@ -198,12 +175,36 @@ class ColorContrastOptimizer {
     }
     
     private func auditSearchBar(_ searchBar: UISearchBar, with configuration: A11yConfiguration) -> [A11yIssue] {
-        guard let textColor = searchBar.searchTextField.textColor,
-              let backgroundColor = searchBar.searchTextField.backgroundColor ?? searchBar.backgroundColor ?? searchBar.superview?.backgroundColor else { return [] }
-        let contrast = textColor.contrastRatio(with: backgroundColor)
-        if contrast < configuration.minimumContrastRatio {
-            return [A11yIssue(view: searchBar, issueType: .colorContrast, description: "Insufficient color contrast for search bar: \(contrast)")]
+        let backgroundColor = getBackgroundColor(searchBar.searchTextField)
+        if let textColor = searchBar.searchTextField.textColor {
+            let (_, contrast) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
+            if contrast < configuration.minimumContrastRatio {
+                return [A11yIssue(view: searchBar, issueType: .colorContrast, description: "Insufficient color contrast for search bar: \(contrast)")]
+            }
         }
         return []
+    }
+    
+    private func getBackgroundColor(_ view: UIView) -> UIColor {
+        if let backgroundColor = view.backgroundColor {
+            return backgroundColor
+        }
+        var currentView = view.superview
+        while currentView != nil {
+            if let backgroundColor = currentView?.backgroundColor {
+                return backgroundColor
+            }
+            currentView = currentView?.superview
+        }
+        return .white // 기본 배경색
+    }
+    
+    private func checkAndAdjustContrast(foregroundColor: UIColor, backgroundColor: UIColor, configuration: A11yConfiguration) -> (UIColor, CGFloat) {
+        let contrast = foregroundColor.contrastRatio(with: backgroundColor)
+        if contrast < configuration.minimumContrastRatio {
+            let adjustedColor = foregroundColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
+            return (adjustedColor, contrast)
+        }
+        return (foregroundColor, contrast)
     }
 }
