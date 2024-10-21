@@ -12,6 +12,8 @@ color contrast.
 - Customizable optimization options
 - Accessibility report generation
 - Logging system for tracking optimizations
+- Undo functionality for optimization actions
+- Asynchronous optimization support
 
 ## Requirements
 
@@ -28,7 +30,7 @@ You can install A11yKit using the [Swift Package Manager](https://swift.org/pack
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/DAWNCR0W/A11yKit.git", from: "1.0.0")
+    .package(url: "https://github.com/DAWNCR0W/A11yKit.git", from: "0.1.1")
 ]
 ```
 
@@ -36,12 +38,12 @@ dependencies: [
 
 ### Basic Usage
 
-```
+```swift
 import A11yKit
 
 class MyViewController: UIViewController {
-override func viewDidLoad() {
-super.viewDidLoad()
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
         // Optimize all views in the view controller
         A11yKit.shared.optimizeAll(self)
@@ -51,7 +53,7 @@ super.viewDidLoad()
 
 ### Advanced Usage
 
-```
+```swift
 import A11yKit
 
 class MyViewController: UIViewController {
@@ -63,7 +65,7 @@ class MyViewController: UIViewController {
         // Configure A11yKit
         a11y.isLoggingEnabled = true
         a11y.minimumContrastRatio = 7.0 // WCAG AAA standard
-        a11y.preferredContentSizeCategory = .large
+        a11y.setPreferredContentSizeCategory(.large)
         
         // Optimize with specific options
         a11y.optimizeAll(self, options: [.voiceOver, .dynamicType])
@@ -76,17 +78,36 @@ class MyViewController: UIViewController {
         // Generate an accessibility report
         let report = a11y.generateAccessibilityReport(for: self)
         print(report)
+        
+        // Perform an accessibility audit
+        let issues = a11y.performAccessibilityAudit(on: self)
+        print("Found \(issues.count) accessibility issues")
+        
+        // Undo last optimization
+        a11y.undoLastOptimization()
+        
+        // Get diagnostic information
+        let diagnosticInfo = a11y.getDiagnosticInfo()
+        print(diagnosticInfo)
+    }
+    
+    func optimizeAsync() async {
+        await A11yKit.shared.optimizeAsync(view)
     }
 }
 ```
 
 ### Customization
 
-A11yKit provides several customization options:
+A11yKit provides several customization options through A11yConfiguration:
 
-- `isLoggingEnabled`: Enable or disable logging of optimization actions
-- `minimumContrastRatio`: Set the minimum contrast ratio for color optimizations
-- `preferredContentSizeCategory`: Set a preferred content size category for Dynamic Type optimizations
+- isEnabled: Enable or disable A11yKit
+- logLevel: Set the logging level
+- autoGenerateVoiceOverLabels: Automatically generate VoiceOver labels
+- enableDynamicType: Enable or disable Dynamic Type optimizations
+- enableColorContrastOptimization: Enable or disable color contrast optimizations
+- minimumContrastRatio: Set the minimum contrast ratio for color optimizations
+- preferredContrastRatio: Set the preferred contrast ratio for color optimizations
 
 ## APIReference
 
@@ -96,13 +117,20 @@ The main class that provides accessibility optimization methods.
 
 #### Methods
 
-- `optimize(_:options:)`: Optimize a single view with specified options
-- `optimizeAll(_:options:)`: Optimize all views in a view controller
-- `optimizeVoiceOver(for:)`: Optimize a view for VoiceOver
-- `optimizeDynamicType(for:)`: Optimize a view for Dynamic Type
-- `optimizeColorContrast(for:)`: Optimize a view's color contrast
-- `resetAccessibilityProperties(for:)`: Reset accessibility properties for a view
-- `generateAccessibilityReport(for:)`: Generate an accessibility report for a view controller
+- optimize(_:options:): Optimize a single view with specified options
+- optimizeAll(_:options:): Optimize all views in a view controller
+- optimizeVoiceOver(for:): Optimize a view for VoiceOver
+- optimizeDynamicType(for:): Optimize a view for Dynamic Type
+- optimizeColorContrast(for:): Optimize a view's color contrast
+- resetAccessibilityProperties(for:): Reset accessibility properties for a view
+- generateAccessibilityReport(for:): Generate an accessibility report for a view controller
+- performAccessibilityAudit(on:): Perform an accessibility audit on a view controller
+- updateConfiguration(_:): Update the A11yKit configuration
+- setLoggingEnabled(_:): Enable or disable logging
+- setMinimumContrastRatio(_:): Set the minimum contrast ratio
+- setPreferredContentSizeCategory(_:): Set the preferred content size category
+- undoLastOptimization(): Undo the last optimization action
+- optimizeAsync(_:options:): Asynchronously optimize a view
 
 ### OptimizationOptions
 

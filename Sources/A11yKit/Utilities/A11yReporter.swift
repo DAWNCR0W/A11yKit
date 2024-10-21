@@ -29,9 +29,11 @@ public class A11yReporter {
             report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n\n"
         }
         
+        A11yLogger.info("Generated accessibility report for \(type(of: viewController))")
+        
         return report
     }
-    
+
     private static func auditViewController(_ viewController: UIViewController) -> [A11yIssue] {
         let voiceOverOptimizer = VoiceOverOptimizer()
         let dynamicTypeOptimizer = DynamicTypeOptimizer()
@@ -51,6 +53,16 @@ public class A11yReporter {
         }
         
         auditRecursively(viewController.view)
-        return issues
+        
+        A11yLogger.debug("Audited \(viewController.view.subviews.count) subviews in \(type(of: viewController))")
+        
+        var uniqueIssues: [A11yIssue] = []
+        for issue in issues {
+            if !uniqueIssues.contains(where: { $0.view === issue.view && $0.issueType == issue.issueType }) {
+                uniqueIssues.append(issue)
+            }
+        }
+        
+        return uniqueIssues
     }
 }

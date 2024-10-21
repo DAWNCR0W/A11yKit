@@ -9,7 +9,12 @@ import UIKit
 import A11yKit
 
 class ViewController: UIViewController {
-
+    @IBOutlet var testLabel: UILabel!
+    @IBOutlet var testButton: UIButton!
+    @IBOutlet var testTextField: UITextField!
+    @IBOutlet var testImageView: UIImageView!
+    @IBOutlet var testView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -28,11 +33,17 @@ class ViewController: UIViewController {
             a11y.optimizeColorContrast(for: specialView)
         }
         
+        a11y.optimizeAll(self)
+        
+        a11y.optimize(testLabel)
+        a11y.optimize(testButton)
+        a11y.optimize(testTextField)
+        a11y.optimize(testImageView)
+        a11y.optimize(testView)
+        
         // Generate an accessibility report
         let report = a11y.generateAccessibilityReport(for: self)
         print(report)
     }
-
-
 }
 
