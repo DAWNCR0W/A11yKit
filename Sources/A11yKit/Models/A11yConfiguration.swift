@@ -8,6 +8,9 @@
 import UIKit
 
 public struct A11yConfiguration {
+    // MARK: - Default Configuration
+    @MainActor public static let `default` = A11yConfiguration()
+    
     // MARK: - General Settings
     public var isEnabled: Bool = true
     public var logLevel: LogLevel = .info
@@ -26,8 +29,17 @@ public struct A11yConfiguration {
     
     // MARK: - Color Contrast Settings
     public var enableColorContrastOptimization: Bool = true
-    public var minimumContrastRatio: CGFloat = 4.5 // WCAG AA standard
-    public var preferredContrastRatio: CGFloat = 7.0 // WCAG AAA standard
+    public var minimumContrastRatio: CGFloat = 4.5 {
+        didSet {
+            minimumContrastRatio = max(1.0, min(minimumContrastRatio, 21.0))
+            preferredContrastRatio = max(preferredContrastRatio, minimumContrastRatio)
+        }
+    } // WCAG AA standard
+    public var preferredContrastRatio: CGFloat = 7.0 {
+        didSet {
+            preferredContrastRatio = max(minimumContrastRatio, min(preferredContrastRatio, 21.0))
+        }
+    } // WCAG AAA standard
     
     // MARK: - Custom Settings
     public var customSettings: [String: Any] = [:]
@@ -48,6 +60,10 @@ public struct A11yConfiguration {
     
     public func getCustomSetting<T>(_ key: String) -> T? {
         return customSettings[key] as? T
+    }
+    
+    public mutating func reset() {
+        self = A11yConfiguration()
     }
 }
 
