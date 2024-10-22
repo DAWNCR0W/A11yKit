@@ -9,48 +9,50 @@ import XCTest
 @testable import A11yKit
 
 class UIButtonA11yTests: XCTestCase {
-    
+
     var button: UIButton!
-    
-    override func setUp() {
-        super.setUp()
+
+    override func setUpWithError() throws {
         button = UIButton(type: .system)
-        button.setTitle("Test Button", for: .normal)
     }
-    
-    override func tearDown() {
-        button = nil
-        super.tearDown()
-    }
-    
-    func testA11yOptimizeForDynamicType() {
+
+    func testOptimizeForDynamicType() throws {
         button.a11y_optimizeForDynamicType()
-        
         XCTAssertTrue(button.titleLabel?.adjustsFontForContentSizeCategory ?? false)
-        XCTAssertNotNil(button.titleLabel?.font.fontDescriptor.object(forKey: .textStyle))
-    }
-    
-    func testA11ySetAccessibleFont() {
-        button.a11y_setAccessibleFont(style: .headline)
         
-        XCTAssertTrue(button.titleLabel?.adjustsFontForContentSizeCategory ?? false)
-        XCTAssertEqual(button.titleLabel?.font, UIFont.preferredFont(forTextStyle: .headline))
+        if let currentFont = button.titleLabel?.font {
+            let scaledFont = UIFontMetrics.default.scaledFont(for: currentFont)
+            XCTAssertEqual(button.titleLabel?.font, scaledFont)
+        }
     }
-    
-    func testA11yOptimizeContrast() {
+
+    func testSetAccessibleFont() throws {
+        button.a11y_setAccessibleFont(style: .title2)
+        XCTAssertEqual(button.titleLabel?.font, UIFont.preferredFont(forTextStyle: .title2))
+        XCTAssertTrue(button.titleLabel?.adjustsFontForContentSizeCategory ?? false)
+    }
+
+    func testOptimizeContrast() throws {
         button.setTitleColor(.lightGray, for: .normal)
         button.backgroundColor = .white
-        
+
         button.a11y_optimizeContrast()
         
-        XCTAssertGreaterThanOrEqual(button.titleColor(for: .normal)?.contrastRatio(with: .white) ?? 0, A11yKit.shared.configuration.minimumContrastRatio)
+        let titleColor = button.titleColor(for: .normal)
+        let contrastRatio = titleColor?.contrastRatio(with: button.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, A11yKit.shared.minimumContrastRatio)
     }
-    
-    func testA11yMakeAccessible() {
-        button.a11y_makeAccessible(prefix: "Action: ", suffix: " (Tap to activate)")
-        
-        XCTAssertTrue(button.isAccessibilityElement)
-        XCTAssertEqual(button.accessibilityLabel, "Action: Test Button (Tap to activate)")
+
+    func testMakeAccessible() throws {
+        button.setTitle("Submit", for: .normal)
+        button.a11y_makeAccessible(prefix: "Action: ", suffix: " button", fallbackText: "Button")
+        XCTAssertEqual(button.accessibilityLabel, "Action: Submit button")
         XCTAssertTrue(button.accessibilityTraits.contains(.button))
+    }
+
+    func testMakeAccessibleFallback() throws {
+        button.setTitle(nil, for: .normal)
+        button.a11y_makeAccessible(prefix: "Action: ", suffix: " button", fallbackText: "Button")
+        XCTAssertEqual(button.accessibilityLabel, "Action: Button button")
     }
 }

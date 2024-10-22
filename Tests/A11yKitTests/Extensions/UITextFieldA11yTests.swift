@@ -9,56 +9,55 @@ import XCTest
 @testable import A11yKit
 
 class UITextFieldA11yTests: XCTestCase {
-    
+
     var textField: UITextField!
-    
-    override func setUp() {
-        super.setUp()
+
+    override func setUpWithError() throws {
         textField = UITextField()
-        textField.placeholder = "Enter text"
     }
-    
-    override func tearDown() {
-        textField = nil
-        super.tearDown()
-    }
-    
-    func testA11yOptimizeForDynamicType() {
+
+    func testOptimizeForDynamicType() throws {
         textField.a11y_optimizeForDynamicType()
-        
         XCTAssertTrue(textField.adjustsFontForContentSizeCategory)
-        XCTAssertNotNil(textField.font?.fontDescriptor.object(forKey: .textStyle))
+        if let font = textField.font {
+            let scaledFont = UIFontMetrics.default.scaledFont(for: font)
+            XCTAssertEqual(textField.font, scaledFont)
+        } else {
+            XCTAssertEqual(textField.font, UIFont.preferredFont(forTextStyle: .body))
+        }
     }
-    
-    func testA11ySetAccessibleFont() {
-        textField.a11y_setAccessibleFont(style: .body)
-        
+
+    func testSetAccessibleFont() throws {
+        textField.a11y_setAccessibleFont(style: .headline)
+        XCTAssertEqual(textField.font, UIFont.preferredFont(forTextStyle: .headline))
         XCTAssertTrue(textField.adjustsFontForContentSizeCategory)
-        XCTAssertEqual(textField.font, UIFont.preferredFont(forTextStyle: .body))
     }
-    
-    func testA11yOptimizeContrast() {
+
+    func testOptimizeContrast() throws {
         textField.textColor = .lightGray
         textField.backgroundColor = .white
-        
         textField.a11y_optimizeContrast()
         
-        XCTAssertGreaterThanOrEqual(textField.textColor?.contrastRatio(with: .white) ?? 0, A11yKit.shared.configuration.minimumContrastRatio)
+        let contrastRatio = textField.textColor?.contrastRatio(with: textField.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, A11yKit.shared.minimumContrastRatio)
     }
-    
-    func testA11yMakeAccessible() {
-        textField.a11y_makeAccessible(prefix: "Input: ", suffix: " (Required)")
-        
-        XCTAssertTrue(textField.isAccessibilityElement)
-        XCTAssertEqual(textField.accessibilityLabel, "Input: Enter text (Required)")
-        XCTAssertTrue(textField.accessibilityTraits.contains(.searchField))
+
+    func testMakeAccessible() throws {
+        textField.placeholder = "Enter your name"
+        textField.a11y_makeAccessible(prefix: "Input", fallbackText: "Text Field")
+        XCTAssertEqual(textField.accessibilityLabel, "InputEnter your name")
     }
-    
-    func testA11ySetAccessiblePlaceholder() {
-        textField.a11y_setAccessiblePlaceholder("Enter your name")
+
+    func testSetAccessiblePlaceholderWithColor() throws {
+        textField.a11y_setAccessiblePlaceholder("Accessible Placeholder", color: .red)
+        let placeholderAttributes = textField.attributedPlaceholder?.attributes(at: 0, effectiveRange: nil)
         
-        XCTAssertNotNil(textField.attributedPlaceholder)
-        XCTAssertEqual(textField.attributedPlaceholder?.string, "Enter your name")
-        XCTAssertTrue(textField.attributedPlaceholder?.attributes(at: 0, effectiveRange: nil).keys.contains(.accessibilitySpeechPunctuation) ?? false)
+        XCTAssertEqual(textField.attributedPlaceholder?.string, "Accessible Placeholder")
+        XCTAssertEqual(placeholderAttributes?[.foregroundColor] as? UIColor, .red)
+    }
+
+    func testSetAccessiblePlaceholderWithoutColor() throws {
+        textField.a11y_setAccessiblePlaceholder("Accessible Placeholder")
+        XCTAssertEqual(textField.attributedPlaceholder?.string, "Accessible Placeholder")
     }
 }

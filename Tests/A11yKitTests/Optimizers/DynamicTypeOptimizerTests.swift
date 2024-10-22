@@ -10,83 +10,79 @@ import XCTest
 
 class DynamicTypeOptimizerTests: XCTestCase {
     
+    var label: UILabel!
+    var button: UIButton!
+    var textField: UITextField!
+    var textView: UITextView!
+    var segmentedControl: UISegmentedControl!
+    var tableView: UITableView!
+    var collectionView: UICollectionView!
+    var searchBar: UISearchBar!
     var optimizer: DynamicTypeOptimizer!
-    var configuration: A11yConfiguration!
-    
-    override func setUp() {
-        super.setUp()
+
+    override func setUpWithError() throws {
         optimizer = DynamicTypeOptimizer()
-        configuration = A11yConfiguration()
+
+        label = UILabel()
+        button = UIButton()
+        textField = UITextField()
+        textView = UITextView()
+        segmentedControl = UISegmentedControl(items: ["First", "Second"])
+        tableView = UITableView()
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        searchBar = UISearchBar()
     }
-    
-    override func tearDown() {
-        optimizer = nil
-        configuration = nil
-        super.tearDown()
-    }
-    
-    func testOptimizeLabel() {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        
-        optimizer.optimize(label, with: configuration)
-        
+
+    func testLabelOptimization() throws {
+        optimizer.optimize(label, with: A11yKit.shared.configuration)
         XCTAssertTrue(label.adjustsFontForContentSizeCategory)
-        XCTAssertNotNil(label.font.fontDescriptor.object(forKey: .textStyle))
     }
-    
-    func testOptimizeButton() {
-        let button = UIButton()
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        
-        optimizer.optimize(button, with: configuration)
-        
+
+    func testButtonOptimization() throws {
+        optimizer.optimize(button, with: A11yKit.shared.configuration)
         XCTAssertTrue(button.titleLabel?.adjustsFontForContentSizeCategory ?? false)
-        XCTAssertNotNil(button.titleLabel?.font.fontDescriptor.object(forKey: .textStyle))
     }
-    
-    func testOptimizeTextField() {
-        let textField = UITextField()
-        textField.font = UIFont.systemFont(ofSize: 14)
-        
-        optimizer.optimize(textField, with: configuration)
-        
+
+    func testTextFieldOptimization() throws {
+        optimizer.optimize(textField, with: A11yKit.shared.configuration)
         XCTAssertTrue(textField.adjustsFontForContentSizeCategory)
-        XCTAssertNotNil(textField.font?.fontDescriptor.object(forKey: .textStyle))
     }
-    
-    func testLargeContentViewerEnabled() {
-        configuration.enableLargeContentViewer = true
-        let button = UIButton()
-        
-        optimizer.optimize(button, with: configuration)
-        
-        XCTAssertTrue(button.showsLargeContentViewer)
+
+    func testTextViewOptimization() throws {
+        optimizer.optimize(textView, with: A11yKit.shared.configuration)
+        XCTAssertTrue(textView.adjustsFontForContentSizeCategory)
     }
-    
-    func testAuditWithIssues() {
-        let view = UIView()
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.adjustsFontForContentSizeCategory = false
-        view.addSubview(label)
-        
-        let issues = optimizer.audit(view, with: configuration)
-        
-        XCTAssertFalse(issues.isEmpty)
-        XCTAssertEqual(issues.first?.issueType, .dynamicType)
-        XCTAssertTrue(issues.first?.description.contains("not adjusted for Dynamic Type") ?? false)
+
+    func testSegmentedControlOptimization() throws {
+        optimizer.optimize(segmentedControl, with: A11yKit.shared.configuration)
+        for state in [UIControl.State.normal, .selected] {
+            let attributes = segmentedControl.titleTextAttributes(for: state)
+            let font = attributes?[.font] as? UIFont
+            XCTAssertNotNil(font)
+            XCTAssertEqual(font, UIFontMetrics.default.scaledFont(for: font ?? UIFont.systemFont(ofSize: 12)))
+        }
     }
-    
-    func testAuditWithoutIssues() {
-        let view = UIView()
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.adjustsFontForContentSizeCategory = true
-        view.addSubview(label)
-        
-        let issues = optimizer.audit(view, with: configuration)
-        
-        XCTAssertTrue(issues.isEmpty)
+
+    func testTableViewOptimization() throws {
+        optimizer.optimize(tableView, with: A11yKit.shared.configuration)
+        XCTAssertEqual(tableView.rowHeight, UITableView.automaticDimension)
+        XCTAssertEqual(tableView.estimatedRowHeight, 44)
+    }
+
+    func testCollectionViewOptimization() throws {
+        let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
+        optimizer.optimize(collectionView, with: A11yKit.shared.configuration)
+        XCTAssertEqual(layout?.estimatedItemSize, UICollectionViewFlowLayout.automaticSize)
+    }
+
+    func testSearchBarOptimization() throws {
+        optimizer.optimize(searchBar, with: A11yKit.shared.configuration)
+        XCTAssertTrue(searchBar.searchTextField.adjustsFontForContentSizeCategory)
+    }
+
+    func testGenericViewOptimization() throws {
+        let genericView = UIView()
+        optimizer.optimizeView(genericView, with: A11yKit.shared.configuration)
+        XCTAssertTrue(genericView.showsLargeContentViewer)
     }
 }
