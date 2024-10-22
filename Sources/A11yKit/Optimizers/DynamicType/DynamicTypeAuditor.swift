@@ -14,6 +14,7 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
         guard configuration.enableDynamicType else { return [] }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return [] }
         
         var issues: [A11yIssue] = []
         
@@ -83,12 +84,17 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     suggestion: "Enable adjustsFontForContentSizeCategory"))
         }
         
-        if let font = label.font, !font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
-            issues.append(A11yIssue(view: label,
-                                    issueType: .dynamicType,
-                                    description: "Label font is not scaling with Dynamic Type",
-                                    severity: .medium,
-                                    suggestion: "Use a scalable font or UIFontMetrics"))
+        if let font = label.font {
+            let metrics = UIFontMetrics(forTextStyle: .body)
+            let scaledFont = metrics.scaledFont(for: font)
+            
+            if scaledFont == font {
+                issues.append(A11yIssue(view: label,
+                                        issueType: .dynamicType,
+                                        description: "Label font is not scaling with Dynamic Type",
+                                        severity: .medium,
+                                        suggestion: "Use a scalable font with UIFontMetrics"))
+            }
         }
         
         return issues

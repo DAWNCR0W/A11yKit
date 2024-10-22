@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         setupUI()
         setupA11yKit()
         
-        a11y.optimizeAll(self)
+//        a11y.optimizeAll(self)
         
         a11y.addAutoExcludedClassPrefix("MyApp_Internal")
         

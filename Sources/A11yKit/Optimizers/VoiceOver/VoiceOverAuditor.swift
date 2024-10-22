@@ -13,6 +13,9 @@ class VoiceOverAuditor: @preconcurrency Auditor {
     // MARK: - Auditor Protocol
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
+        guard configuration.enableVoiceOverOptimization else { return [] }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return [] }
+        
         var issues: [A11yIssue] = []
         
         issues.append(contentsOf: auditView(view, with: configuration))

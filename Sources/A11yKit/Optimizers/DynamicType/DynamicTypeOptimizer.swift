@@ -18,6 +18,7 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
         guard configuration.enableDynamicType else { return }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return }
         
         optimizeView(view, with: configuration)
         
@@ -147,18 +148,15 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
             return UIFont.preferredFont(forTextStyle: textStyle)
         }
         
-        if font.fontDescriptor.object(forKey: .textStyle) != nil {
+        guard font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) else {
             return font
         }
         
-        let metrics = UIFontMetrics(forTextStyle: textStyle)
-        let scaledFont = metrics.scaledFont(for: font)
-        
         if let preferredCategory = configuration.preferredContentSizeCategory {
-            return UIFontMetrics.default.scaledFont(for: scaledFont, compatibleWith: UITraitCollection(preferredContentSizeCategory: preferredCategory))
+            let traitCollection = UITraitCollection(preferredContentSizeCategory: preferredCategory)
+            return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: font, compatibleWith: traitCollection)
         }
         
-        return scaledFont
+        return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: font)
     }
-
 }

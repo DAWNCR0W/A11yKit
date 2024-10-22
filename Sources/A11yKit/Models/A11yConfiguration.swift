@@ -16,6 +16,7 @@ public struct A11yConfiguration {
     public var logLevel: LogLevel = .info
     
     // MARK: - VoiceOver Settings
+    public var enableVoiceOverOptimization: Bool = true
     public var autoGenerateVoiceOverLabels: Bool = true
     public var voiceOverLabelPrefix: String = ""
     public var voiceOverLabelSuffix: String = ""
@@ -98,6 +99,7 @@ extension A11yConfiguration: CustomStringConvertible {
         A11yConfiguration:
         - Enabled: \(isEnabled)
         - Log Level: \(logLevel)
+        - Enable VoiceOver Optimization: \(enableVoiceOverOptimization)
         - Auto Generate VoiceOver Labels: \(autoGenerateVoiceOverLabels)
         - Enable Dynamic Type: \(enableDynamicType)
         - Preferred Content Size Category: \(preferredContentSizeCategory?.rawValue ?? "nil")

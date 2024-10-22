@@ -24,6 +24,7 @@ class ColorContrastAuditor: @preconcurrency Auditor {
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
         guard configuration.enableColorContrastOptimization else { return [] }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return [] }
         
         var issues = auditView(view, with: configuration)
         

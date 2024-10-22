@@ -13,6 +13,9 @@ class VoiceOverOptimizer: @preconcurrency Optimizer {
     // MARK: - Optimizer Protocol
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
+        guard configuration.enableVoiceOverOptimization else { return }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return }
+        
         optimizeView(view, with: configuration)
         
         for subview in view.subviews {
