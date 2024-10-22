@@ -23,6 +23,8 @@ class ColorContrastAuditor: @preconcurrency Auditor {
     // MARK: - Auditor Protocol
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
+        guard configuration.enableColorContrastOptimization else { return [] }
+        
         var issues = auditView(view, with: configuration)
         
         for subview in view.subviews {
@@ -62,6 +64,12 @@ class ColorContrastAuditor: @preconcurrency Auditor {
                               description: "Insufficient color contrast for label: \(contrast)",
                               severity: .high,
                               suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)")]
+        } else if contrast < configuration.preferredContrastRatio {
+            return [A11yIssue(view: label,
+                              issueType: .colorContrast,
+                              description: "Color contrast for label could be improved: \(contrast)",
+                              severity: .medium,
+                              suggestion: "Consider increasing the contrast ratio to \(configuration.preferredContrastRatio) for better accessibility")]
         }
         return []
     }
@@ -76,6 +84,12 @@ class ColorContrastAuditor: @preconcurrency Auditor {
                                   description: "Insufficient color contrast for button: \(contrast)",
                                   severity: .high,
                                   suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)")]
+            } else if contrast < configuration.preferredContrastRatio {
+                return [A11yIssue(view: button,
+                                  issueType: .colorContrast,
+                                  description: "Color contrast for button could be improved: \(contrast)",
+                                  severity: .medium,
+                                  suggestion: "Consider increasing the contrast ratio to \(configuration.preferredContrastRatio) for better accessibility")]
             }
         }
         return []
@@ -91,6 +105,12 @@ class ColorContrastAuditor: @preconcurrency Auditor {
                                   description: "Insufficient color contrast for text field: \(contrast)",
                                   severity: .high,
                                   suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)")]
+            } else if contrast < configuration.preferredContrastRatio {
+                return [A11yIssue(view: textField,
+                                  issueType: .colorContrast,
+                                  description: "Color contrast for text field could be improved: \(contrast)",
+                                  severity: .medium,
+                                  suggestion: "Consider increasing the contrast ratio to \(configuration.preferredContrastRatio) for better accessibility")]
             }
         }
         return []
@@ -106,6 +126,12 @@ class ColorContrastAuditor: @preconcurrency Auditor {
                                   description: "Insufficient color contrast for text view: \(contrast)",
                                   severity: .high,
                                   suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)")]
+            } else if contrast < configuration.preferredContrastRatio {
+                return [A11yIssue(view: textView,
+                                  issueType: .colorContrast,
+                                  description: "Color contrast for text view could be improved: \(contrast)",
+                                  severity: .medium,
+                                  suggestion: "Consider increasing the contrast ratio to \(configuration.preferredContrastRatio) for better accessibility")]
             }
         }
         return []
@@ -121,10 +147,16 @@ class ColorContrastAuditor: @preconcurrency Auditor {
                 let contrast = textColor.contrastRatio(with: backgroundColor)
                 if contrast < configuration.minimumContrastRatio {
                     issues.append(A11yIssue(view: segmentedControl,
-                                            issueType: .colorContrast,
-                                            description: "Insufficient color contrast for segmented control (\(state == .normal ? "normal" : "selected") state): \(contrast)",
-                                            severity: .high,
-                                            suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)"))
+                                           issueType: .colorContrast,
+                                           description: "Insufficient color contrast for segmented control: \(contrast)",
+                                           severity: .high,
+                                           suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)"))
+                } else if contrast < configuration.preferredContrastRatio {
+                    issues.append(A11yIssue(view: segmentedControl,
+                                           issueType: .colorContrast,
+                                           description: "Color contrast for segmented control could be improved: \(contrast)",
+                                           severity: .medium,
+                                           suggestion: "Consider increasing the contrast ratio to \(configuration.preferredContrastRatio) for better accessibility"))
                 }
             }
         }
@@ -141,6 +173,12 @@ class ColorContrastAuditor: @preconcurrency Auditor {
                                   description: "Insufficient color contrast for search bar: \(contrast)",
                                   severity: .high,
                                   suggestion: "Increase the contrast ratio to at least \(configuration.minimumContrastRatio)")]
+            } else if contrast < configuration.preferredContrastRatio {
+                return [A11yIssue(view: searchBar,
+                                  issueType: .colorContrast,
+                                  description: "Color contrast for search bar could be improved: \(contrast)",
+                                  severity: .medium,
+                                  suggestion: "Consider increasing the contrast ratio to \(configuration.preferredContrastRatio) for better accessibility")]
             }
         }
         return []

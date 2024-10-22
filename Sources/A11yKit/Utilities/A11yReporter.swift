@@ -15,6 +15,10 @@ public class A11yReporter {
         var report = "A11yKit Accessibility Report\n"
         report += "==============================\n\n"
         
+        let configuration = A11yKit.shared.configuration
+        report += "Configuration:\n"
+        report += configuration.description + "\n\n"
+        
         let issues = auditViewController(viewController)
         
         report += "Summary:\n"
@@ -34,7 +38,7 @@ public class A11yReporter {
             report += "\n"
         }
         
-        A11yLogger.log("Generated accessibility report for \(type(of: viewController))", level: .info)
+        A11yLogger.info("Generated accessibility report for \(type(of: viewController))")
         
         return report
     }
@@ -48,9 +52,15 @@ public class A11yReporter {
         var issues: [A11yIssue] = []
         
         func auditRecursively(_ view: UIView) {
-            issues.append(contentsOf: voiceOverAuditor.audit(view, with: configuration))
-            issues.append(contentsOf: dynamicTypeAuditor.audit(view, with: configuration))
-            issues.append(contentsOf: colorContrastAuditor.audit(view, with: configuration))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(contentsOf: voiceOverAuditor.audit(view, with: configuration))
+            }
+            if configuration.enableDynamicType {
+                issues.append(contentsOf: dynamicTypeAuditor.audit(view, with: configuration))
+            }
+            if configuration.enableColorContrastOptimization {
+                issues.append(contentsOf: colorContrastAuditor.audit(view, with: configuration))
+            }
             
             for subview in view.subviews {
                 auditRecursively(subview)
@@ -59,7 +69,7 @@ public class A11yReporter {
         
         auditRecursively(viewController.view)
         
-        A11yLogger.log("Audited \(viewController.view.subviews.count) subviews in \(type(of: viewController))", level: .debug)
+        A11yLogger.debug("Audited \(viewController.view.subviews.count) subviews in \(type(of: viewController))")
         
         var uniqueIssues: [A11yIssue] = []
         for issue in issues {

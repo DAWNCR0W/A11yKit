@@ -132,6 +132,11 @@ public class A11yKit {
         A11yLogger.log("Logging \(enabled ? "enabled" : "disabled")", level: .info)
     }
     
+    public func setPreferredContentSizeCategory(_ category: UIContentSizeCategory?) {
+        configuration.setContentSizeCategory(category)
+        A11yLogger.log("Set preferred content size category to \(category?.rawValue ?? "nil")", level: .info)
+    }
+    
     // MARK: - Undo Methods
     
     public func undoLastOptimization() {
@@ -149,5 +154,14 @@ public class A11yKit {
             Configuration: \(configuration)
             Optimized Views: \(optimizationStack.count)
             """
+    }
+    
+    // MARK: - Exclude
+    public func addAutoExcludedClassPrefix(_ prefix: String) {
+        configuration.autoExcludedClassPrefixes.insert(prefix)
+    }
+    
+    public func removeAutoExcludedClassPrefix(_ prefix: String) {
+        configuration.autoExcludedClassPrefixes.remove(prefix)
     }
 }

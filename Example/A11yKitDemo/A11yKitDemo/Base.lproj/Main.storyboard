@@ -26,7 +26,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3M-Lo-yZa">
                                 <rect key="frame" x="0.0" y="114" width="393" height="35"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Execute(Button)"/>
                             </button>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="eC3-xk-f8C">
                                 <rect key="frame" x="0.0" y="80" width="393" height="34"/>
@@ -46,28 +46,63 @@
                                     <constraint firstAttribute="height" constant="100" id="fj7-mK-rEW"/>
                                 </constraints>
                             </view>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="B4A-FE-ywK">
+                                <rect key="frame" x="0.0" y="349" width="393" height="32"/>
+                                <segments>
+                                    <segment title="First"/>
+                                    <segment title="Second"/>
+                                </segments>
+                            </segmentedControl>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="LYo-s1-Svy">
+                                <rect key="frame" x="0.0" y="380" width="393" height="32"/>
+                                <segments>
+                                    <segment title="First"/>
+                                    <segment title="Second"/>
+                                </segments>
+                            </segmentedControl>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="W3q-rj-8BH">
+                                <rect key="frame" x="0.0" y="411" width="393" height="407"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="W3q-rj-8BH" secondAttribute="bottom" id="2JP-l1-RKN"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="E3M-Lo-yZa" secondAttribute="trailing" id="3bZ-Nm-N1i"/>
+                            <constraint firstItem="B4A-FE-ywK" firstAttribute="top" secondItem="cJ7-ku-GoL" secondAttribute="bottom" id="5wK-YX-49Z"/>
                             <constraint firstItem="cJ7-ku-GoL" firstAttribute="top" secondItem="e1w-Y2-kDi" secondAttribute="bottom" id="Bp2-Gp-VAr"/>
                             <constraint firstItem="E3M-Lo-yZa" firstAttribute="top" secondItem="eC3-xk-f8C" secondAttribute="bottom" id="Mmi-fd-t8m"/>
                             <constraint firstItem="KAK-5a-gut" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ScV-rF-bE9"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="e1w-Y2-kDi" secondAttribute="trailing" id="W8g-AK-ln8"/>
+                            <constraint firstItem="W3q-rj-8BH" firstAttribute="top" secondItem="LYo-s1-Svy" secondAttribute="bottom" id="Xia-vc-RVS"/>
                             <constraint firstItem="cJ7-ku-GoL" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Xk2-UD-9YH"/>
                             <constraint firstItem="eC3-xk-f8C" firstAttribute="top" secondItem="KAK-5a-gut" secondAttribute="bottom" id="XtG-4m-kTv"/>
+                            <constraint firstItem="W3q-rj-8BH" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="YFn-WQ-6VV"/>
                             <constraint firstItem="e1w-Y2-kDi" firstAttribute="top" secondItem="E3M-Lo-yZa" secondAttribute="bottom" id="a4R-gy-GG6"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="cJ7-ku-GoL" secondAttribute="trailing" id="eaB-4j-S57"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="LYo-s1-Svy" secondAttribute="trailing" id="enK-Ck-WJz"/>
                             <constraint firstItem="eC3-xk-f8C" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="es0-sy-CVN"/>
                             <constraint firstItem="E3M-Lo-yZa" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="f4u-dp-kCR"/>
                             <constraint firstItem="KAK-5a-gut" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="ge2-wh-e4B"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="eC3-xk-f8C" secondAttribute="trailing" id="hDY-19-xz9"/>
+                            <constraint firstItem="B4A-FE-ywK" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="jKS-OO-Ymu"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="W3q-rj-8BH" secondAttribute="trailing" id="ltD-YU-hd9"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="KAK-5a-gut" secondAttribute="trailing" id="phS-ju-DQJ"/>
+                            <constraint firstItem="LYo-s1-Svy" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="rIZ-vV-ZBe"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="B4A-FE-ywK" secondAttribute="trailing" id="rOQ-oc-V0G"/>
+                            <constraint firstItem="LYo-s1-Svy" firstAttribute="top" secondItem="B4A-FE-ywK" secondAttribute="bottom" id="rhY-zS-zaB"/>
                             <constraint firstItem="e1w-Y2-kDi" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="y8h-43-a2a"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="actionSegmentedControl" destination="B4A-FE-ywK" id="zQx-EG-9vx"/>
+                        <outlet property="optionSegmentedControl" destination="LYo-s1-Svy" id="VaB-f1-OCN"/>
+                        <outlet property="resultTextView" destination="W3q-rj-8BH" id="8Nb-o3-bBX"/>
                         <outlet property="testButton" destination="E3M-Lo-yZa" id="sGk-i6-oBQ"/>
                         <outlet property="testImageView" destination="e1w-Y2-kDi" id="K9D-Ua-N54"/>
                         <outlet property="testLabel" destination="KAK-5a-gut" id="ZQW-kf-HAD"/>
@@ -82,11 +117,14 @@
     </scenes>
     <resources>
         <image name="figure.run" catalog="system" width="115" height="128"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

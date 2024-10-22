@@ -30,11 +30,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if view.isAccessibilityElement && view.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: view,
-                                    issueType: .voiceOver,
-                                    description: "Missing accessibility label",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label to this view"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: view,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: view,
+                                        issueType: .voiceOver,
+                                        description: "Missing accessibility label",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label to this view"))
+            }
         }
         
         switch view {
@@ -71,11 +79,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if label.text?.isEmpty ?? true && label.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: label,
-                                    issueType: .voiceOver,
-                                    description: "Empty label without accessibility label",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label or text to this label"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: label,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for empty label",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: label,
+                                        issueType: .voiceOver,
+                                        description: "Empty label without accessibility label",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label or text to this label"))
+            }
         }
         
         return issues
@@ -85,11 +101,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if button.accessibilityLabel == nil && button.titleLabel?.text == nil {
-            issues.append(A11yIssue(view: button,
-                                    issueType: .voiceOver,
-                                    description: "Button without label or title",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label or title to this button"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: button,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for button without title",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: button,
+                                        issueType: .voiceOver,
+                                        description: "Button without accessibility label or title",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label or title to this button"))
+            }
         }
         
         return issues
@@ -99,11 +123,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if textField.accessibilityLabel == nil && textField.placeholder == nil {
-            issues.append(A11yIssue(view: textField,
-                                    issueType: .voiceOver,
-                                    description: "TextField without label or placeholder",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label or placeholder to this text field"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: textField,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for text field without placeholder",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: textField,
+                                        issueType: .voiceOver,
+                                        description: "TextField without label or placeholder",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label or placeholder to this text field"))
+            }
         }
         
         return issues
@@ -113,11 +145,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if imageView.isAccessibilityElement && imageView.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: imageView,
-                                    issueType: .voiceOver,
-                                    description: "Image without accessibility label",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label to this image"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: imageView,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for image",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: imageView,
+                                        issueType: .voiceOver,
+                                        description: "Image without accessibility label",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label to this image"))
+            }
         }
         
         return issues
@@ -127,11 +167,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if textView.isAccessibilityElement && textView.accessibilityLabel == nil && textView.text.isEmpty {
-            issues.append(A11yIssue(view: textView,
-                                    issueType: .voiceOver,
-                                    description: "Empty TextView without accessibility label",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label to this empty text view"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: textView,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for empty text view",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: textView,
+                                        issueType: .voiceOver,
+                                        description: "Empty text view without accessibility label",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label or text to this text view"))
+            }
         }
         
         return issues
@@ -141,11 +189,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if segmentedControl.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: segmentedControl,
-                                    issueType: .voiceOver,
-                                    description: "SegmentedControl without accessibility label",
-                                    severity: .medium,
-                                    suggestion: "Add an accessibility label to this segmented control"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: segmentedControl,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for segmented control",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: segmentedControl,
+                                        issueType: .voiceOver,
+                                        description: "Segmented control without accessibility label",
+                                        severity: .low,
+                                        suggestion: "Add an accessibility label to this segmented control"))
+            }
         }
         
         return issues
@@ -155,11 +211,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if tableView.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: tableView,
-                                    issueType: .voiceOver,
-                                    description: "TableView without accessibility label",
-                                    severity: .low,
-                                    suggestion: "Consider adding an accessibility label to this table view"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: tableView,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for table view",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: tableView,
+                                        issueType: .voiceOver,
+                                        description: "TableView without accessibility label",
+                                        severity: .low,
+                                        suggestion: "Add an accessibility label to this table view"))
+            }
         }
         
         return issues
@@ -169,11 +233,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if collectionView.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: collectionView,
-                                    issueType: .voiceOver,
-                                    description: "CollectionView without accessibility label",
-                                    severity: .low,
-                                    suggestion: "Consider adding an accessibility label to this collection view"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: collectionView,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for collection view",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: collectionView,
+                                        issueType: .voiceOver,
+                                        description: "CollectionView without accessibility label",
+                                        severity: .low,
+                                        suggestion: "Add an accessibility label to this collection view"))
+            }
         }
         
         return issues
@@ -183,11 +255,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if searchBar.accessibilityLabel == nil && searchBar.placeholder == nil {
-            issues.append(A11yIssue(view: searchBar,
-                                    issueType: .voiceOver,
-                                    description: "SearchBar without accessibility label or placeholder",
-                                    severity: .medium,
-                                    suggestion: "Add an accessibility label or placeholder to this search bar"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: searchBar,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for search bar without placeholder",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: searchBar,
+                                        issueType: .voiceOver,
+                                        description: "Search bar without accessibility label or placeholder",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label or placeholder to this search bar"))
+            }
         }
         
         return issues
@@ -197,11 +277,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if switchControl.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: switchControl,
-                                    issueType: .voiceOver,
-                                    description: "Switch without accessibility label",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label to this switch"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: switchControl,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for switch",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: switchControl,
+                                        issueType: .voiceOver,
+                                        description: "Switch without accessibility label",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label to this switch"))
+            }
         }
         
         return issues
@@ -211,11 +299,19 @@ class VoiceOverAuditor: @preconcurrency Auditor {
         var issues: [A11yIssue] = []
         
         if slider.accessibilityLabel == nil {
-            issues.append(A11yIssue(view: slider,
-                                    issueType: .voiceOver,
-                                    description: "Slider without accessibility label",
-                                    severity: .high,
-                                    suggestion: "Add an accessibility label to this slider"))
+            if configuration.autoGenerateVoiceOverLabels {
+                issues.append(A11yIssue(view: slider,
+                                        issueType: .voiceOver,
+                                        description: "Auto-generated accessibility label for slider",
+                                        severity: .low,
+                                        suggestion: "Consider providing a custom accessibility label"))
+            } else {
+                issues.append(A11yIssue(view: slider,
+                                        issueType: .voiceOver,
+                                        description: "Slider without accessibility label",
+                                        severity: .high,
+                                        suggestion: "Add an accessibility label to this slider"))
+            }
         }
         
         return issues

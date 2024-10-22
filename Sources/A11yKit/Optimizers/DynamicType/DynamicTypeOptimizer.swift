@@ -17,6 +17,8 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     // MARK: - Optimizer Protocol
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
+        guard configuration.enableDynamicType else { return }
+        
         optimizeView(view, with: configuration)
         
         for subview in view.subviews {
@@ -51,7 +53,7 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     
     private func optimizeLabel(_ label: UILabel, with configuration: A11yConfiguration) {
         label.adjustsFontForContentSizeCategory = true
-        label.font = scaledFont(for: label.font, textStyle: .body)
+        label.font = scaledFont(for: label.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             label.showsLargeContentViewer = true
@@ -61,7 +63,7 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     private func optimizeButton(_ button: UIButton, with configuration: A11yConfiguration) {
         button.titleLabel?.adjustsFontForContentSizeCategory = true
         if let titleFont = button.titleLabel?.font {
-            button.titleLabel?.font = scaledFont(for: titleFont, textStyle: .body)
+            button.titleLabel?.font = scaledFont(for: titleFont, textStyle: .body, configuration: configuration)
         }
         
         if configuration.enableLargeContentViewer {
@@ -71,7 +73,7 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     
     private func optimizeTextField(_ textField: UITextField, with configuration: A11yConfiguration) {
         textField.adjustsFontForContentSizeCategory = true
-        textField.font = scaledFont(for: textField.font, textStyle: .body)
+        textField.font = scaledFont(for: textField.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             textField.showsLargeContentViewer = true
@@ -80,7 +82,7 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     
     private func optimizeTextView(_ textView: UITextView, with configuration: A11yConfiguration) {
         textView.adjustsFontForContentSizeCategory = true
-        textView.font = scaledFont(for: textView.font, textStyle: .body)
+        textView.font = scaledFont(for: textView.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             textView.showsLargeContentViewer = true
@@ -92,12 +94,12 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
         let selectedAttributes = segmentedControl.titleTextAttributes(for: .selected) ?? [:]
         
         if let font = defaultAttributes[.font] as? UIFont {
-            let scaledFont = scaledFont(for: font, textStyle: .body)
+            let scaledFont = scaledFont(for: font, textStyle: .body, configuration: configuration)
             segmentedControl.setTitleTextAttributes([.font: scaledFont], for: .normal)
         }
         
         if let font = selectedAttributes[.font] as? UIFont {
-            let scaledFont = scaledFont(for: font, textStyle: .body)
+            let scaledFont = scaledFont(for: font, textStyle: .body, configuration: configuration)
             segmentedControl.setTitleTextAttributes([.font: scaledFont], for: .selected)
         }
         
@@ -127,7 +129,7 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     
     private func optimizeSearchBar(_ searchBar: UISearchBar, with configuration: A11yConfiguration) {
         searchBar.searchTextField.adjustsFontForContentSizeCategory = true
-        searchBar.searchTextField.font = scaledFont(for: searchBar.searchTextField.font, textStyle: .body)
+        searchBar.searchTextField.font = scaledFont(for: searchBar.searchTextField.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             searchBar.showsLargeContentViewer = true
@@ -140,15 +142,23 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
         }
     }
     
-    private func scaledFont(for font: UIFont?, textStyle: UIFont.TextStyle) -> UIFont {
-        let baseFont = font ?? UIFont.preferredFont(forTextStyle: textStyle)
+    private func scaledFont(for font: UIFont?, textStyle: UIFont.TextStyle, configuration: A11yConfiguration) -> UIFont {
+        guard let font = font else {
+            return UIFont.preferredFont(forTextStyle: textStyle)
+        }
         
-        if baseFont.fontDescriptor.object(forKey: .textStyle) != nil {
-            return baseFont
+        if font.fontDescriptor.object(forKey: .textStyle) != nil {
+            return font
         }
         
         let metrics = UIFontMetrics(forTextStyle: textStyle)
-        return metrics.scaledFont(for: baseFont)
+        let scaledFont = metrics.scaledFont(for: font)
+        
+        if let preferredCategory = configuration.preferredContentSizeCategory {
+            return UIFontMetrics.default.scaledFont(for: scaledFont, compatibleWith: UITraitCollection(preferredContentSizeCategory: preferredCategory))
+        }
+        
+        return scaledFont
     }
 
 }

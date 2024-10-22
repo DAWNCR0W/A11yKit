@@ -13,6 +13,8 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
     // MARK: - Auditor Protocol
     
     func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
+        guard configuration.enableDynamicType else { return [] }
+        
         var issues: [A11yIssue] = []
         
         issues.append(contentsOf: auditView(view, with: configuration))
@@ -58,6 +60,15 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     suggestion: "Enable Large Content Viewer for this view"))
         }
         
+        let currentCategory = UIApplication.shared.preferredContentSizeCategory
+        if !configuration.isContentSizeCategoryAllowed(currentCategory) {
+            issues.append(A11yIssue(view: view,
+                                    issueType: .dynamicType,
+                                    description: "Current content size category (\(currentCategory)) is outside the allowed range",
+                                    severity: .high,
+                                    suggestion: "Adjust the content size category range in the configuration"))
+        }
+        
         return issues
     }
     
@@ -70,6 +81,14 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     description: "Label not adjusted for Dynamic Type",
                                     severity: .high,
                                     suggestion: "Enable adjustsFontForContentSizeCategory"))
+        }
+        
+        if let font = label.font, !font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
+            issues.append(A11yIssue(view: label,
+                                    issueType: .dynamicType,
+                                    description: "Label font is not scaling with Dynamic Type",
+                                    severity: .medium,
+                                    suggestion: "Use a scalable font or UIFontMetrics"))
         }
         
         return issues
@@ -86,6 +105,15 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     suggestion: "Enable adjustsFontForContentSizeCategory for the button's titleLabel"))
         }
         
+        if let titleFont = button.titleLabel?.font,
+           !titleFont.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
+            issues.append(A11yIssue(view: button,
+                                    issueType: .dynamicType,
+                                    description: "Button title font is not scaling with Dynamic Type",
+                                    severity: .medium,
+                                    suggestion: "Use a scalable font or UIFontMetrics"))
+        }
+        
         return issues
     }
     
@@ -100,6 +128,14 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     suggestion: "Enable adjustsFontForContentSizeCategory"))
         }
         
+        if let font = textField.font, !font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
+            issues.append(A11yIssue(view: textField,
+                                    issueType: .dynamicType,
+                                    description: "TextField font is not scaling with Dynamic Type",
+                                    severity: .medium,
+                                    suggestion: "Use a scalable font or UIFontMetrics"))
+        }
+        
         return issues
     }
     
@@ -112,6 +148,14 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     description: "TextView not adjusted for Dynamic Type",
                                     severity: .high,
                                     suggestion: "Enable adjustsFontForContentSizeCategory"))
+        }
+        
+        if let font = textView.font, !font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
+            issues.append(A11yIssue(view: textView,
+                                    issueType: .dynamicType,
+                                    description: "TextView font is not scaling with Dynamic Type",
+                                    severity: .medium,
+                                    suggestion: "Use a scalable font or UIFontMetrics"))
         }
         
         return issues
@@ -173,6 +217,14 @@ class DynamicTypeAuditor: @preconcurrency Auditor {
                                     description: "SearchBar text field not adjusted for Dynamic Type",
                                     severity: .high,
                                     suggestion: "Enable adjustsFontForContentSizeCategory for the search text field"))
+        }
+        
+        if let font = searchBar.searchTextField.font, !font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) {
+            issues.append(A11yIssue(view: searchBar,
+                                    issueType: .dynamicType,
+                                    description: "SearchBar text field font is not scaling with Dynamic Type",
+                                    severity: .medium,
+                                    suggestion: "Use a scalable font or UIFontMetrics"))
         }
         
         return issues

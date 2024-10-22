@@ -23,6 +23,9 @@ class ColorContrastOptimizer: @preconcurrency Optimizer {
     // MARK: - Optimizer Protocol
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
+        guard configuration.enableColorContrastOptimization else { return }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return }
+        
         optimizeView(view, with: configuration)
         
         for subview in view.subviews {
@@ -59,9 +62,11 @@ class ColorContrastOptimizer: @preconcurrency Optimizer {
     
     private func optimizeButton(_ button: UIButton, with configuration: A11yConfiguration) {
         let backgroundColor = getBackgroundColor(button)
-        if let titleColor = button.titleColor(for: .normal) {
-            let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: titleColor, backgroundColor: backgroundColor, configuration: configuration)
-            button.setTitleColor(adjustedColor, for: .normal)
+        for state in [UIControl.State.normal, .highlighted, .selected] {
+            if let titleColor = button.titleColor(for: state) {
+                let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: titleColor, backgroundColor: backgroundColor, configuration: configuration)
+                button.setTitleColor(adjustedColor, for: state)
+            }
         }
     }
     
@@ -83,12 +88,10 @@ class ColorContrastOptimizer: @preconcurrency Optimizer {
     
     private func optimizeSegmentedControl(_ segmentedControl: UISegmentedControl, with configuration: A11yConfiguration) {
         let backgroundColor = getBackgroundColor(segmentedControl)
-        for state in [UIControl.State.normal, .selected] {
-            if var titleTextAttributes = segmentedControl.titleTextAttributes(for: state),
-               let textColor = titleTextAttributes[.foregroundColor] as? UIColor {
-                let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: textColor, backgroundColor: backgroundColor, configuration: configuration)
-                titleTextAttributes[.foregroundColor] = adjustedColor
-                segmentedControl.setTitleTextAttributes(titleTextAttributes, for: state)
+        for index in 0..<segmentedControl.numberOfSegments {
+            if let titleColor = segmentedControl.titleTextAttributes(for: .normal)?[.foregroundColor] as? UIColor {
+                let (adjustedColor, _) = checkAndAdjustContrast(foregroundColor: titleColor, backgroundColor: backgroundColor, configuration: configuration)
+                segmentedControl.setTitleTextAttributes([.foregroundColor: adjustedColor], for: .normal)
             }
         }
     }
@@ -118,7 +121,7 @@ class ColorContrastOptimizer: @preconcurrency Optimizer {
     private func checkAndAdjustContrast(foregroundColor: UIColor, backgroundColor: UIColor, configuration: A11yConfiguration) -> (UIColor, CGFloat) {
         let contrast = foregroundColor.contrastRatio(with: backgroundColor)
         if contrast < configuration.minimumContrastRatio {
-            let adjustedColor = foregroundColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.minimumContrastRatio)
+            let adjustedColor = foregroundColor.adjustedForContrast(against: backgroundColor, targetContrast: configuration.preferredContrastRatio)
             return (adjustedColor, contrast)
         }
         return (foregroundColor, contrast)
