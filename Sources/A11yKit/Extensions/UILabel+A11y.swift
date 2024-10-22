@@ -24,7 +24,7 @@ public extension UILabel {
     
     func a11y_optimizeContrast(against backgroundColor: UIColor) {
         guard let currentTextColor = textColor else { return }
-        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio ?? 4.5 // WCAG AA
+        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio
         let currentContrast = currentTextColor.contrastRatio(with: backgroundColor)
         if currentContrast < minimumContrastRatio {
             textColor = currentTextColor.adjustedForContrast(against: backgroundColor, targetContrast: minimumContrastRatio)

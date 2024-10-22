@@ -196,7 +196,7 @@ class ColorContrastOptimizer {
             }
             currentView = currentView?.superview
         }
-        return .white // 기본 배경색
+        return .white
     }
     
     private func checkAndAdjustContrast(foregroundColor: UIColor, backgroundColor: UIColor, configuration: A11yConfiguration) -> (UIColor, CGFloat) {

@@ -22,7 +22,7 @@ public extension UIButton {
         guard let titleColor = titleColor(for: .normal),
               let backgroundColor = backgroundColor ?? superview?.backgroundColor else { return }
         
-        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio ?? 4.5 // WCAG AA
+        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio
         let currentContrast = titleColor.contrastRatio(with: backgroundColor)
         if currentContrast < minimumContrastRatio {
             let adjustedColor = titleColor.adjustedForContrast(against: backgroundColor, targetContrast: minimumContrastRatio)
