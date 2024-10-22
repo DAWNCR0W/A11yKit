@@ -12,6 +12,8 @@ public extension UITextField {
         adjustsFontForContentSizeCategory = true
         if let customFont = font {
             font = UIFontMetrics.default.scaledFont(for: customFont)
+        } else {
+            font = UIFont.preferredFont(forTextStyle: .body)
         }
     }
     
@@ -24,21 +26,23 @@ public extension UITextField {
         guard let textColor = textColor,
               let backgroundColor = backgroundColor ?? superview?.backgroundColor else { return }
         
+        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio // WCAG AA
         let currentContrast = textColor.contrastRatio(with: backgroundColor)
-        if currentContrast < A11yKit.shared.configuration.minimumContrastRatio {
-            self.textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: A11yKit.shared.configuration.minimumContrastRatio)
+        if currentContrast < minimumContrastRatio {
+            self.textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: minimumContrastRatio)
         }
     }
     
-    func a11y_makeAccessible(prefix: String = "", suffix: String = "") {
-        let textFieldText = placeholder ?? ""
-        a11y_makeAccessible(label: prefix + textFieldText + suffix, traits: .searchField)
+    func a11y_makeAccessible(prefix: String = "", suffix: String = "", fallbackText: String = "Text Field", traits: UIAccessibilityTraits = .none) {
+        let textFieldText = placeholder ?? text ?? fallbackText
+        a11y_makeAccessible(label: prefix + textFieldText + suffix, traits: traits)
     }
     
-    func a11y_setAccessiblePlaceholder(_ placeholder: String) {
-        attributedPlaceholder = NSAttributedString(
-            string: placeholder,
-            attributes: [.accessibilitySpeechPunctuation: true]
-        )
+    func a11y_setAccessiblePlaceholder(_ placeholder: String, color: UIColor? = nil) {
+        var attributes: [NSAttributedString.Key: Any] = [.accessibilitySpeechPunctuation: true]
+        if let color = color {
+            attributes[.foregroundColor] = color
+        }
+        attributedPlaceholder = NSAttributedString(string: placeholder, attributes: attributes)
     }
 }

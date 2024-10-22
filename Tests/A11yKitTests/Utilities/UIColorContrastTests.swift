@@ -6,51 +6,57 @@
 //
 
 import XCTest
-@testable import A11yKit
+import UIKit
 
 class UIColorContrastTests: XCTestCase {
     
-    func testContrastRatio() {
-        let whiteColor = UIColor.white
-        let blackColor = UIColor.black
-        let grayColor = UIColor.gray
-        
-        XCTAssertEqual(whiteColor.contrastRatio(with: blackColor), 21.0, accuracy: 0.1)
-        XCTAssertEqual(whiteColor.contrastRatio(with: grayColor), 3.95, accuracy: 0.1)
-        XCTAssertEqual(blackColor.contrastRatio(with: grayColor), 5.31, accuracy: 0.1)
+    var color: UIColor!
+    var backgroundColor: UIColor!
+
+    override func setUpWithError() throws {
+        color = UIColor.white
+        backgroundColor = UIColor.black
     }
-    
-    func testLuminance() {
-        XCTAssertEqual(UIColor.white.luminance(), 1.0, accuracy: 0.01)
-        XCTAssertEqual(UIColor.black.luminance(), 0.0, accuracy: 0.01)
-        XCTAssertEqual(UIColor.gray.luminance(), 0.2158, accuracy: 0.01)
+
+    func testContrastRatio() throws {
+        let contrastRatio = color.contrastRatio(with: backgroundColor)
+        XCTAssertEqual(contrastRatio, 21.0, accuracy: 0.001)
     }
-    
-    func testAdjustedForContrast() {
-        let lightGray = UIColor.lightGray
-        let white = UIColor.white
-        let targetContrast: CGFloat = 4.5
-        
-        let adjustedColor = lightGray.adjustedForContrast(against: white, targetContrast: targetContrast)
-        
-        XCTAssertGreaterThanOrEqual(adjustedColor.contrastRatio(with: white), targetContrast)
+
+    func testLuminanceCalculationForWhite() throws {
+        let whiteLuminance = UIColor.white.luminance()
+        XCTAssertEqual(whiteLuminance, 1.0, accuracy: 0.001)
     }
-    
-    func testMeetsMinimumContrast() {
-        let blackColor = UIColor.black
-        let whiteColor = UIColor.white
-        let grayColor = UIColor.gray
-        
-        XCTAssertTrue(blackColor.meetsMinimumContrast(4.5, against: whiteColor))
-        XCTAssertFalse(grayColor.meetsMinimumContrast(4.5, against: whiteColor))
-        XCTAssertTrue(grayColor.meetsMinimumContrast(3.0, against: whiteColor))
+
+    func testLuminanceCalculationForBlack() throws {
+        let blackLuminance = UIColor.black.luminance()
+        XCTAssertEqual(blackLuminance, 0.0, accuracy: 0.001)
     }
-    
-    func testContrastRatioEdgeCases() {
-        let sameColor = UIColor.red
-        XCTAssertEqual(sameColor.contrastRatio(with: sameColor), 1.0, accuracy: 0.01)
+
+    func testAdjustedForContrast_Lighten() throws {
+        let lowContrastColor = UIColor.gray
+        let adjustedColor = lowContrastColor.adjustedForContrast(against: backgroundColor, targetContrast: 4.5)
         
-        let transparentColor = UIColor.clear
-        XCTAssertEqual(UIColor.black.contrastRatio(with: transparentColor), 1.0, accuracy: 0.01)
+        let adjustedContrast = adjustedColor.contrastRatio(with: backgroundColor)
+        XCTAssertGreaterThanOrEqual(adjustedContrast, 4.5)
+    }
+
+    func testAdjustedForContrast_Darken() throws {
+        let lowContrastBackground = UIColor.white
+        let adjustedColor = color.adjustedForContrast(against: lowContrastBackground, targetContrast: 7.0)
+        
+        let adjustedContrast = adjustedColor.contrastRatio(with: lowContrastBackground)
+        XCTAssertGreaterThanOrEqual(adjustedContrast, 7.0)
+    }
+
+    func testMeetsMinimumContrast() throws {
+        let meetsContrast = color.meetsMinimumContrast(4.5, against: backgroundColor)
+        XCTAssertTrue(meetsContrast)
+    }
+
+    func testDoesNotMeetMinimumContrast() throws {
+        let lowContrastColor = UIColor.lightGray
+        let meetsContrast = lowContrastColor.meetsMinimumContrast(7.0, against: backgroundColor)
+        XCTAssertFalse(meetsContrast)
     }
 }

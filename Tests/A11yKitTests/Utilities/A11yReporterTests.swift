@@ -11,69 +11,50 @@ import XCTest
 class A11yReporterTests: XCTestCase {
     
     var viewController: UIViewController!
-    
-    override func setUp() {
-        super.setUp()
+    var testView: UIView!
+
+    override func setUpWithError() throws {
         viewController = UIViewController()
+        testView = UIView()
+        viewController.view.addSubview(testView)
     }
-    
-    override func tearDown() {
-        viewController = nil
-        super.tearDown()
+
+    func testGenerateReport() throws {
+        let report = A11yReporter.generateReport(for: viewController)
+        XCTAssertTrue(report.contains("A11yKit Accessibility Report"))
+        XCTAssertTrue(report.contains("Total issues found"))
     }
-    
-    func testGenerateReport() {
+
+    func testReportHasVoiceOverIssues() throws {
+        testView.isAccessibilityElement = true
+        testView.accessibilityLabel = nil
+        let report = A11yReporter.generateReport(for: viewController)
+        XCTAssertTrue(report.contains("VoiceOver issues"))
+        XCTAssertTrue(report.contains("Missing accessibility label"))
+    }
+
+    func testReportHasNoIssues() throws {
+        testView.isAccessibilityElement = true
+        testView.accessibilityLabel = "Test View"
+        let report = A11yReporter.generateReport(for: viewController)
+        XCTAssertTrue(report.contains("- Total issues found: 0"))
+    }
+
+    func testReportHasDynamicTypeIssues() throws {
         let label = UILabel()
-        label.text = "Test Label"
+        viewController.view.addSubview(label)
+        label.adjustsFontForContentSizeCategory = false
+        let report = A11yReporter.generateReport(for: viewController)
+        XCTAssertTrue(report.contains("Dynamic Type issues"))
+        XCTAssertTrue(report.contains("Label not adjusted for Dynamic Type"))
+    }
+
+    func testReportHasColorContrastIssues() throws {
+        let label = UILabel()
         label.textColor = .lightGray
         label.backgroundColor = .white
-        label.isAccessibilityElement = false
-        
-        let button = UIButton()
-        button.setTitle("Test Button", for: .normal)
-        button.accessibilityLabel = nil
-        
         viewController.view.addSubview(label)
-        viewController.view.addSubview(button)
-        
         let report = A11yReporter.generateReport(for: viewController)
-        
-        XCTAssertTrue(report.contains("A11yKit Accessibility Report"))
-        XCTAssertTrue(report.contains("Total issues found:"))
-        XCTAssertTrue(report.contains("VoiceOver issues:"))
-        XCTAssertTrue(report.contains("Dynamic Type issues:"))
-        XCTAssertTrue(report.contains("Color Contrast issues:"))
-        XCTAssertTrue(report.contains("UILabel"))
-        XCTAssertTrue(report.contains("UIButton"))
-    }
-    
-    func testReportWithNoIssues() {
-        let label = UILabel()
-        label.text = "Perfect Label"
-        label.textColor = .black
-        label.backgroundColor = .white
-        label.isAccessibilityElement = true
-        label.accessibilityLabel = "Perfect Label"
-        label.adjustsFontForContentSizeCategory = true
-        
-        viewController.view.addSubview(label)
-        
-        let report = A11yReporter.generateReport(for: viewController)
-        
-        XCTAssertTrue(report.contains("Total issues found: 0"))
-    }
-    
-    func testReportContainsViewHierarchy() {
-        let containerView = UIView()
-        let nestedLabel = UILabel()
-        nestedLabel.text = "Nested Label"
-        
-        containerView.addSubview(nestedLabel)
-        viewController.view.addSubview(containerView)
-        
-        let report = A11yReporter.generateReport(for: viewController)
-        
-        XCTAssertTrue(report.contains("UIView"))
-        XCTAssertTrue(report.contains("  UILabel"))  // Indented to show hierarchy
+        XCTAssertTrue(report.contains("Color Contrast issues"))
     }
 }

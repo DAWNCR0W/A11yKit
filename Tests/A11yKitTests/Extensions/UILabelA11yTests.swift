@@ -9,47 +9,49 @@ import XCTest
 @testable import A11yKit
 
 class UILabelA11yTests: XCTestCase {
-    
+
     var label: UILabel!
-    
-    override func setUp() {
-        super.setUp()
+
+    override func setUpWithError() throws {
         label = UILabel()
-        label.text = "Test Label"
     }
-    
-    override func tearDown() {
-        label = nil
-        super.tearDown()
-    }
-    
-    func testA11yOptimizeForDynamicType() {
+
+    func testOptimizeForDynamicType() throws {
         label.a11y_optimizeForDynamicType()
-        
         XCTAssertTrue(label.adjustsFontForContentSizeCategory)
-        XCTAssertNotNil(label.font.fontDescriptor.object(forKey: .textStyle))
-    }
-    
-    func testA11ySetAccessibleFont() {
-        label.a11y_setAccessibleFont(style: .headline)
         
-        XCTAssertTrue(label.adjustsFontForContentSizeCategory)
-        XCTAssertEqual(label.font, UIFont.preferredFont(forTextStyle: .headline))
+        if let currentFont = label.font {
+            let scaledFont = UIFontMetrics.default.scaledFont(for: currentFont)
+            XCTAssertEqual(label.font, scaledFont)
+        } else {
+            XCTAssertEqual(label.font, UIFont.preferredFont(forTextStyle: .body))
+        }
     }
-    
-    func testA11yOptimizeContrast() {
+
+    func testSetAccessibleFont() throws {
+        label.a11y_setAccessibleFont(style: .title1)
+        XCTAssertEqual(label.font, UIFont.preferredFont(forTextStyle: .title1))
+        XCTAssertTrue(label.adjustsFontForContentSizeCategory)
+    }
+
+    func testOptimizeContrast() throws {
         label.textColor = .lightGray
         label.backgroundColor = .white
+        label.a11y_optimizeContrast(against: label.backgroundColor ?? .white)
         
-        label.a11y_optimizeContrast(against: .white)
-        
-        XCTAssertGreaterThanOrEqual(label.textColor.contrastRatio(with: .white), A11yKit.shared.configuration.minimumContrastRatio)
+        let contrastRatio = label.textColor?.contrastRatio(with: label.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, A11yKit.shared.minimumContrastRatio)
     }
-    
-    func testA11yMakeAccessible() {
-        label.a11y_makeAccessible(prefix: "Important: ", suffix: " (Required)")
-        
-        XCTAssertTrue(label.isAccessibilityElement)
-        XCTAssertEqual(label.accessibilityLabel, "Important: Test Label (Required)")
+
+    func testMakeAccessible() throws {
+        label.text = "Label Text"
+        label.a11y_makeAccessible(prefix: "Prefix: ", suffix: " Suffix", fallbackText: "Default Label")
+        XCTAssertEqual(label.accessibilityLabel, "Prefix: Label Text Suffix")
+    }
+
+    func testMakeAccessibleFallback() throws {
+        label.text = nil
+        label.a11y_makeAccessible(prefix: "Prefix: ", suffix: " Suffix", fallbackText: "Default Label")
+        XCTAssertEqual(label.accessibilityLabel, "Prefix: Default Label Suffix")
     }
 }

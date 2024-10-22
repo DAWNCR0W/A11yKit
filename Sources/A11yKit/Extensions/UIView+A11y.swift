@@ -14,9 +14,15 @@ public extension UIView {
     
     func a11y_makeAccessible(label: String? = nil, hint: String? = nil, traits: UIAccessibilityTraits = []) {
         isAccessibilityElement = true
-        accessibilityLabel = label ?? accessibilityLabel
-        accessibilityHint = hint ?? accessibilityHint
-        accessibilityTraits = traits.isEmpty ? accessibilityTraits : traits
+        if let label = label {
+            accessibilityLabel = label
+        }
+        if let hint = hint {
+            accessibilityHint = hint
+        }
+        if !traits.isEmpty {
+            accessibilityTraits = traits
+        }
     }
     
     func a11y_hide() {
@@ -24,13 +30,21 @@ public extension UIView {
         accessibilityElementsHidden = true
     }
     
+    func a11y_show() {
+        isAccessibilityElement = true
+        accessibilityElementsHidden = false
+    }
+    
     var a11y_isAccessibilityElement: Bool {
         get { return isAccessibilityElement }
         set { isAccessibilityElement = newValue }
     }
     
-    func a11y_addCustomAction(_ name: String, target: Any?, selector: Selector) {
-        let action = UIAccessibilityCustomAction(name: name, target: target, selector: selector)
+    func a11y_addCustomAction(_ name: String, action: @escaping () -> Void) {
+        let action = UIAccessibilityCustomAction(name: name) { _ in
+            action()
+            return true
+        }
         if accessibilityCustomActions == nil {
             accessibilityCustomActions = [action]
         } else {

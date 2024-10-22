@@ -13,6 +13,7 @@ public struct OptimizationOptions: OptionSet, Sendable {
     public static let voiceOver = OptimizationOptions(rawValue: 1 << 0)
     public static let dynamicType = OptimizationOptions(rawValue: 1 << 1)
     public static let colorContrast = OptimizationOptions(rawValue: 1 << 2)
+    public static let none = OptimizationOptions([])
     
     public static let all: OptimizationOptions = [.voiceOver, .dynamicType, .colorContrast]
     

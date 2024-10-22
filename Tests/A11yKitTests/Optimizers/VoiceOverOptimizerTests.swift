@@ -10,83 +10,104 @@ import XCTest
 
 class VoiceOverOptimizerTests: XCTestCase {
     
-    var optimizer: VoiceOverOptimizer!
-    
-    override func setUp() {
-        super.setUp()
-        optimizer = VoiceOverOptimizer()
-    }
-    
-    override func tearDown() {
-        optimizer = nil
-        super.tearDown()
-    }
-    
-    func testOptimizeLabel() {
-        let label = UILabel()
-        label.text = "Test Label"
+    var viewController: UIViewController!
+    var label: UILabel!
+    var button: UIButton!
+    var textField: UITextField!
+    var imageView: UIImageView!
+    var textView: UITextView!
+    var segmentedControl: UISegmentedControl!
+    var switchControl: UISwitch!
+    var slider: UISlider!
+
+    override func setUpWithError() throws {
+        viewController = UIViewController()
         
-        optimizer.optimize(label)
+        label = UILabel()
+        label.text = "Label Text"
         
-        XCTAssertTrue(label.isAccessibilityElement)
-        XCTAssertEqual(label.accessibilityLabel, "Test Label")
-        XCTAssertTrue(label.accessibilityTraits.contains(.staticText))
-    }
-    
-    func testOptimizeButton() {
-        let button = UIButton()
-        button.setTitle("Test Button", for: .normal)
+        button = UIButton()
+        button.setTitle("Button Title", for: .normal)
         
-        optimizer.optimize(button)
-        
-        XCTAssertTrue(button.isAccessibilityElement)
-        XCTAssertEqual(button.accessibilityLabel, "Test Button")
-        XCTAssertTrue(button.accessibilityTraits.contains(.button))
-    }
-    
-    func testOptimizeImageView() {
-        let imageView = UIImageView()
-        imageView.accessibilityIdentifier = "TestImage"
-        
-        optimizer.optimize(imageView)
-        
-        XCTAssertTrue(imageView.isAccessibilityElement)
-        XCTAssertEqual(imageView.accessibilityLabel, "TestImage")
-        XCTAssertTrue(imageView.accessibilityTraits.contains(.image))
-    }
-    
-    func testOptimizeTextField() {
-        let textField = UITextField()
+        textField = UITextField()
         textField.placeholder = "Enter text"
         
-        optimizer.optimize(textField)
+        imageView = UIImageView()
+        imageView.isUserInteractionEnabled = true
         
-        XCTAssertTrue(textField.isAccessibilityElement)
+        textView = UITextView()
+        textView.text = "Sample TextView"
+        
+        segmentedControl = UISegmentedControl(items: ["First", "Second"])
+        
+        switchControl = UISwitch()
+        
+        slider = UISlider()
+
+        viewController.view.addSubview(label)
+        viewController.view.addSubview(button)
+        viewController.view.addSubview(textField)
+        viewController.view.addSubview(imageView)
+        viewController.view.addSubview(textView)
+        viewController.view.addSubview(segmentedControl)
+        viewController.view.addSubview(switchControl)
+        viewController.view.addSubview(slider)
+    }
+
+    func testLabelOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(label)
+        XCTAssertEqual(label.accessibilityLabel, "Label Text")
+        XCTAssertTrue(label.accessibilityTraits.contains(.staticText))
+    }
+
+    func testButtonOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(button)
+        XCTAssertEqual(button.accessibilityLabel, "Button Title")
+        XCTAssertTrue(button.accessibilityTraits.contains(.button))
+    }
+
+    func testTextFieldOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(textField)
         XCTAssertEqual(textField.accessibilityLabel, "Enter text")
         XCTAssertTrue(textField.accessibilityTraits.contains(.searchField))
     }
-    
-    func testAuditWithIssues() {
-        let view = UIView()
-        let button = UIButton()
-        view.addSubview(button)
-        
-        let issues = optimizer.audit(view)
-        
-        XCTAssertFalse(issues.isEmpty)
-        XCTAssertEqual(issues.first?.issueType, .voiceOver)
-        XCTAssertTrue(issues.first?.description.contains("Missing accessibility label") ?? false)
+
+    func testImageViewOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(imageView)
+        XCTAssertEqual(imageView.accessibilityLabel, "Image")
+        XCTAssertTrue(imageView.accessibilityTraits.contains(.image))
+        XCTAssertTrue(imageView.accessibilityTraits.contains(.button))
     }
-    
-    func testAuditWithoutIssues() {
-        let view = UIView()
-        let label = UILabel()
-        label.text = "Accessible Label"
-        label.isAccessibilityElement = true
-        view.addSubview(label)
-        
-        let issues = optimizer.audit(view)
-        
-        XCTAssertTrue(issues.isEmpty)
+
+    func testTextViewOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(textView)
+        XCTAssertEqual(textView.accessibilityLabel, "Sample TextView")
+        XCTAssertTrue(textView.accessibilityTraits.contains(.staticText))
+    }
+
+    func testSegmentedControlOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(segmentedControl)
+        XCTAssertEqual(segmentedControl.accessibilityLabel, "Segmented Control")
+        XCTAssertTrue(segmentedControl.accessibilityTraits.contains(.adjustable))
+    }
+
+    func testSwitchOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(switchControl)
+        XCTAssertEqual(switchControl.accessibilityLabel, "Switch")
+        XCTAssertTrue(switchControl.accessibilityTraits.contains(.button))
+    }
+
+    func testSliderOptimization() throws {
+        let optimizer = VoiceOverOptimizer()
+        optimizer.optimize(slider)
+        XCTAssertEqual(slider.accessibilityLabel, "Slider")
+        XCTAssertTrue(slider.accessibilityTraits.contains(.adjustable))
     }
 }

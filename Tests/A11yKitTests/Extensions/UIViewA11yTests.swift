@@ -9,68 +9,69 @@ import XCTest
 @testable import A11yKit
 
 class UIViewA11yTests: XCTestCase {
-    
-    var view: UIView!
-    var expectation: XCTestExpectation!
-    
-    override func setUp() {
-        super.setUp()
-        view = UIView()
+
+    var testView: UIView!
+    var button: UIButton!
+    var label: UILabel!
+    var textField: UITextField!
+
+    override func setUpWithError() throws {
+        testView = UIView()
+        button = UIButton(type: .system)
+        label = UILabel()
+        textField = UITextField()
+        testView.addSubview(button)
+        testView.addSubview(label)
+        testView.addSubview(textField)
     }
-    
-    override func tearDown() {
-        view = nil
-        expectation = nil
-        super.tearDown()
+
+    func testMakeAccessible() throws {
+        testView.a11y_makeAccessible(label: "Test View", hint: "Hint for Test View", traits: .button)
+        XCTAssertTrue(testView.isAccessibilityElement)
+        XCTAssertEqual(testView.accessibilityLabel, "Test View")
+        XCTAssertEqual(testView.accessibilityHint, "Hint for Test View")
+        XCTAssertTrue(testView.accessibilityTraits.contains(.button))
     }
-    
-    func testA11yOptimize() {
-        view.a11y_optimize()
-        XCTAssertTrue(view.isAccessibilityElement)
+
+    func testHideAccessibility() throws {
+        testView.a11y_hide()
+        XCTAssertFalse(testView.isAccessibilityElement)
+        XCTAssertTrue(testView.accessibilityElementsHidden)
     }
-    
-    func testA11yMakeAccessible() {
-        view.a11y_makeAccessible(label: "Test View", hint: "This is a test view", traits: .button)
-        
-        XCTAssertTrue(view.isAccessibilityElement)
-        XCTAssertEqual(view.accessibilityLabel, "Test View")
-        XCTAssertEqual(view.accessibilityHint, "This is a test view")
-        XCTAssertTrue(view.accessibilityTraits.contains(.button))
+
+    func testShowAccessibility() throws {
+        testView.a11y_show()
+        XCTAssertTrue(testView.isAccessibilityElement)
+        XCTAssertFalse(testView.accessibilityElementsHidden)
     }
-    
-    func testA11yHide() {
-        view.a11y_hide()
+
+    func testAccessibilityElementToggle() throws {
+        testView.a11y_isAccessibilityElement = true
+        XCTAssertTrue(testView.isAccessibilityElement)
         
-        XCTAssertFalse(view.isAccessibilityElement)
-        XCTAssertTrue(view.accessibilityElementsHidden)
+        testView.a11y_isAccessibilityElement = false
+        XCTAssertFalse(testView.isAccessibilityElement)
     }
-    
-    func testA11yIsAccessibilityElement() {
-        view.a11y_isAccessibilityElement = true
-        XCTAssertTrue(view.isAccessibilityElement)
-        
-        view.a11y_isAccessibilityElement = false
-        XCTAssertFalse(view.isAccessibilityElement)
-    }
-    
-    func testA11yAddCustomAction() {
-        expectation = self.expectation(description: "Custom action called")
-        
-        view.a11y_addCustomAction("Test Action", target: self, selector: #selector(customActionHandler))
-        
-        XCTAssertEqual(view.accessibilityCustomActions?.count, 1)
-        XCTAssertEqual(view.accessibilityCustomActions?.first?.name, "Test Action")
-        
-        if let action = view.accessibilityCustomActions?.first {
-            action.perform(#selector(customActionHandler))
-        } else {
-            XCTFail("No custom action found")
+
+    func testAddCustomAccessibilityAction() throws {
+        var customActionTriggered = false
+        testView.a11y_addCustomAction("Custom Action") {
+            customActionTriggered = true
         }
         
-        waitForExpectations(timeout: 1, handler: nil)
+        let customActions = testView.accessibilityCustomActions
+        XCTAssertEqual(customActions?.count, 1)
+        
+        let action = customActions?.first
+        XCTAssertEqual(action?.name, "Custom Action")
+        
+        action?.action?(action!)
+        XCTAssertTrue(customActionTriggered)
     }
-    
-    @objc func customActionHandler() {
-        expectation.fulfill()
+
+    func testOptimizeViewAccessibility() throws {
+        A11yKit.shared.configuration.logLevel = .debug
+        testView.a11y_optimize(options: .voiceOver)
+        XCTAssertTrue(testView.isAccessibilityElement)
     }
 }

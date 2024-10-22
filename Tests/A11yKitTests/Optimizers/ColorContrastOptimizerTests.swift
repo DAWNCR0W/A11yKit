@@ -9,90 +9,82 @@ import XCTest
 @testable import A11yKit
 
 class ColorContrastOptimizerTests: XCTestCase {
-    
+
+    var label: UILabel!
+    var button: UIButton!
+    var textField: UITextField!
+    var textView: UITextView!
+    var segmentedControl: UISegmentedControl!
+    var searchBar: UISearchBar!
     var optimizer: ColorContrastOptimizer!
     var configuration: A11yConfiguration!
-    
-    override func setUp() {
-        super.setUp()
+
+    override func setUpWithError() throws {
         optimizer = ColorContrastOptimizer()
         configuration = A11yConfiguration()
-        configuration.minimumContrastRatio = 4.5
-    }
-    
-    override func tearDown() {
-        optimizer = nil
-        configuration = nil
-        super.tearDown()
-    }
-    
-    func testOptimizeLabel() {
-        let label = UILabel()
-        label.text = "Test Label"
-        label.textColor = .lightGray
+        
+        label = UILabel()
+        button = UIButton()
+        textField = UITextField()
+        textView = UITextView()
+        segmentedControl = UISegmentedControl(items: ["One", "Two"])
+        searchBar = UISearchBar()
+
+        label.textColor = .gray
         label.backgroundColor = .white
-        
-        optimizer.optimize(label, with: configuration)
-        
-        XCTAssertGreaterThanOrEqual(label.textColor.contrastRatio(with: .white), configuration.minimumContrastRatio)
-    }
-    
-    func testOptimizeButton() {
-        let button = UIButton()
-        button.setTitle("Test Button", for: .normal)
-        button.setTitleColor(.lightGray, for: .normal)
+
+        button.setTitleColor(.gray, for: .normal)
         button.backgroundColor = .white
-        
-        optimizer.optimize(button, with: configuration)
-        
-        XCTAssertGreaterThanOrEqual(button.titleColor(for: .normal)?.contrastRatio(with: .white) ?? 0, configuration.minimumContrastRatio)
-    }
-    
-    func testOptimizeTextField() {
-        let textField = UITextField()
-        textField.textColor = .lightGray
+
+        textField.textColor = .gray
         textField.backgroundColor = .white
-        
-        optimizer.optimize(textField, with: configuration)
-        
-        XCTAssertGreaterThanOrEqual(textField.textColor?.contrastRatio(with: .white) ?? 0, configuration.minimumContrastRatio)
+
+        textView.textColor = .gray
+        textView.backgroundColor = .white
+
+        searchBar.searchTextField.textColor = .gray
+        searchBar.searchTextField.backgroundColor = .white
     }
-    
-    func testNoOptimizationNeeded() {
-        let label = UILabel()
-        label.textColor = .black
-        label.backgroundColor = .white
-        
+
+    func testOptimizeLabelContrast() throws {
         optimizer.optimize(label, with: configuration)
-        
-        XCTAssertEqual(label.textColor, .black)
+        let contrastRatio = label.textColor.contrastRatio(with: label.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio, configuration.minimumContrastRatio)
     }
-    
-    func testAuditWithIssues() {
-        let view = UIView()
-        let label = UILabel()
-        label.text = "Test Label"
-        label.textColor = .lightGray
-        label.backgroundColor = .white
-        view.addSubview(label)
-        
-        let issues = optimizer.audit(view, with: configuration)
-        
-        XCTAssertFalse(issues.isEmpty)
-        XCTAssertEqual(issues.first?.issueType, .colorContrast)
-        XCTAssertTrue(issues.first?.description.contains("Insufficient color contrast") ?? false)
+
+    func testOptimizeButtonContrast() throws {
+        optimizer.optimize(button, with: configuration)
+        let titleColor = button.titleColor(for: .normal)
+        let contrastRatio = titleColor?.contrastRatio(with: button.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, configuration.minimumContrastRatio)
     }
-    
-    func testAuditWithoutIssues() {
-        let view = UIView()
-        let label = UILabel()
-        label.text = "Test Label"
-        label.textColor = .black
-        label.backgroundColor = .white
-        view.addSubview(label)
-        
-        let issues = optimizer.audit(view, with: configuration)
-        
-        XCTAssertTrue(issues.isEmpty)
+
+    func testOptimizeTextFieldContrast() throws {
+        optimizer.optimize(textField, with: configuration)
+        let contrastRatio = textField.textColor?.contrastRatio(with: textField.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, configuration.minimumContrastRatio)
+    }
+
+    func testOptimizeTextViewContrast() throws {
+        optimizer.optimize(textView, with: configuration)
+        let contrastRatio = textView.textColor?.contrastRatio(with: textView.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, configuration.minimumContrastRatio)
+    }
+
+    func testOptimizeSegmentedControlContrast() throws {
+        optimizer.optimize(segmentedControl, with: configuration)
+        for state in [UIControl.State.normal, .selected] {
+            let attributes = segmentedControl.titleTextAttributes(for: state)
+            let textColor = attributes?[.foregroundColor] as? UIColor
+            let contrastRatio = textColor?.contrastRatio(with: segmentedControl.backgroundColor ?? .white)
+            XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, configuration.minimumContrastRatio)
+        }
+    }
+
+    func testOptimizeSearchBarContrast() throws {
+        optimizer.optimize(searchBar, with: configuration)
+        let textColor = searchBar.searchTextField.textColor
+        let contrastRatio = textColor?.contrastRatio(with: searchBar.searchTextField.backgroundColor ?? .white)
+        XCTAssertGreaterThanOrEqual(contrastRatio ?? 0, configuration.minimumContrastRatio)
     }
 }

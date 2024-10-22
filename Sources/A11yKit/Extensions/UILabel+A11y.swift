@@ -12,6 +12,8 @@ public extension UILabel {
         adjustsFontForContentSizeCategory = true
         if let customFont = font {
             font = UIFontMetrics.default.scaledFont(for: customFont)
+        } else {
+            font = UIFont.preferredFont(forTextStyle: .body)
         }
     }
     
@@ -21,13 +23,16 @@ public extension UILabel {
     }
     
     func a11y_optimizeContrast(against backgroundColor: UIColor) {
-        let currentContrast = textColor.contrastRatio(with: backgroundColor)
-        if currentContrast < A11yKit.shared.configuration.minimumContrastRatio {
-            textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: A11yKit.shared.configuration.minimumContrastRatio)
+        guard let currentTextColor = textColor else { return }
+        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio
+        let currentContrast = currentTextColor.contrastRatio(with: backgroundColor)
+        if currentContrast < minimumContrastRatio {
+            textColor = currentTextColor.adjustedForContrast(against: backgroundColor, targetContrast: minimumContrastRatio)
         }
     }
     
-    func a11y_makeAccessible(prefix: String = "", suffix: String = "") {
-        a11y_makeAccessible(label: prefix + (text ?? "") + suffix)
+    func a11y_makeAccessible(prefix: String = "", suffix: String = "", fallbackText: String = "Label") {
+        let labelText = text ?? fallbackText
+        a11y_makeAccessible(label: prefix + labelText + suffix)
     }
 }
