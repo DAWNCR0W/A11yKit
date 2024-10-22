@@ -8,7 +8,7 @@
 import UIKit
 
 @MainActor
-class DynamicTypeOptimizer: Optimizer {
+class DynamicTypeOptimizer: @preconcurrency Optimizer {
     
     // MARK: - Properties
     

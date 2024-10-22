@@ -26,26 +26,31 @@ public class A11yReporter {
         report += "Detailed Issues:\n"
         for (index, issue) in issues.enumerated() {
             report += "\(index + 1). [\(issue.issueType)] \(issue.description)\n"
-            report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n\n"
+            report += "   View: \(type(of: issue.view)), Accessibility Identifier: \(issue.view.accessibilityIdentifier ?? "N/A")\n"
+            report += "   Severity: \(issue.severity)\n"
+            if let suggestion = issue.suggestion {
+                report += "   Suggestion: \(suggestion)\n"
+            }
+            report += "\n"
         }
         
-        A11yLogger.info("Generated accessibility report for \(type(of: viewController))")
+        A11yLogger.log("Generated accessibility report for \(type(of: viewController))", level: .info)
         
         return report
     }
 
     private static func auditViewController(_ viewController: UIViewController) -> [A11yIssue] {
-        let voiceOverOptimizer = VoiceOverOptimizer()
-        let dynamicTypeOptimizer = DynamicTypeOptimizer()
-        let colorContrastOptimizer = ColorContrastOptimizer()
+        let voiceOverAuditor = VoiceOverAuditor()
+        let dynamicTypeAuditor = DynamicTypeAuditor()
+        let colorContrastAuditor = ColorContrastAuditor()
         let configuration = A11yKit.shared.configuration
         
         var issues: [A11yIssue] = []
         
         func auditRecursively(_ view: UIView) {
-            issues.append(contentsOf: voiceOverOptimizer.audit(view))
-            issues.append(contentsOf: dynamicTypeOptimizer.audit(view, with: configuration))
-            issues.append(contentsOf: colorContrastOptimizer.audit(view, with: configuration))
+            issues.append(contentsOf: voiceOverAuditor.audit(view, with: configuration))
+            issues.append(contentsOf: dynamicTypeAuditor.audit(view, with: configuration))
+            issues.append(contentsOf: colorContrastAuditor.audit(view, with: configuration))
             
             for subview in view.subviews {
                 auditRecursively(subview)
@@ -54,7 +59,7 @@ public class A11yReporter {
         
         auditRecursively(viewController.view)
         
-        A11yLogger.debug("Audited \(viewController.view.subviews.count) subviews in \(type(of: viewController))")
+        A11yLogger.log("Audited \(viewController.view.subviews.count) subviews in \(type(of: viewController))", level: .debug)
         
         var uniqueIssues: [A11yIssue] = []
         for issue in issues {

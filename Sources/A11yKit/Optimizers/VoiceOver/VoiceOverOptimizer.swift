@@ -8,7 +8,7 @@
 import UIKit
 
 @MainActor
-class VoiceOverOptimizer: Optimizer {
+class VoiceOverOptimizer: @preconcurrency Optimizer {
     
     // MARK: - Optimizer Protocol
     

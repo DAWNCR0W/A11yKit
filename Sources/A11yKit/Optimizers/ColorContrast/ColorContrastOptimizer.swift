@@ -8,7 +8,7 @@
 import UIKit
 
 @MainActor
-class ColorContrastOptimizer: Optimizer {
+class ColorContrastOptimizer: @preconcurrency Optimizer {
     
     // MARK: - Properties
     
