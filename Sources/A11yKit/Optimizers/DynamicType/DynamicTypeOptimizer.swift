@@ -141,11 +141,14 @@ class DynamicTypeOptimizer: @preconcurrency Optimizer {
     }
     
     private func scaledFont(for font: UIFont?, textStyle: UIFont.TextStyle) -> UIFont {
-        guard let font = font else {
-            return UIFont.preferredFont(forTextStyle: textStyle)
+        let baseFont = font ?? UIFont.preferredFont(forTextStyle: textStyle)
+        
+        if baseFont.fontDescriptor.object(forKey: .textStyle) != nil {
+            return baseFont
         }
         
         let metrics = UIFontMetrics(forTextStyle: textStyle)
-        return metrics.scaledFont(for: font)
+        return metrics.scaledFont(for: baseFont)
     }
+
 }
