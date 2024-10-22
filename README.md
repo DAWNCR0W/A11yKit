@@ -10,10 +10,19 @@ color contrast.
 - Dynamic Type support for better text readability
 - Color contrast enhancement for improved visibility
 - Customizable optimization options
-- Accessibility report generation
+- Accessibility auditing and report generation
 - Logging system for tracking optimizations
 - Undo functionality for optimization actions
 - Asynchronous optimization support
+
+## Accessibility Standards
+
+A11yKit helps your app comply with the following accessibility standards:
+
+- WCAG 2.1 (Web Content Accessibility Guidelines)
+  - Supports up to AAA level for color contrast
+- iOS Accessibility Best Practices
+- Section 508 of the Rehabilitation Act
 
 ## Requirements
 
@@ -63,16 +72,19 @@ class MyViewController: UIViewController {
         let a11y = A11yKit.shared
         
         // Configure A11yKit
-        a11y.isLoggingEnabled = true
-        a11y.minimumContrastRatio = 7.0 // WCAG AAA standard
-        a11y.setPreferredContentSizeCategory(.large)
+        a11y.setLoggingEnabled(true)
+        
+        var config = A11yConfiguration()
+        config.minimumContrastRatio = 7.0 // WCAG AAA standard
+        config.preferredContentSizeCategory = .large
+        a11y.updateConfiguration(config)
         
         // Optimize with specific options
-        a11y.optimizeAll(self, options: [.voiceOver, .dynamicType])
+        a11y.optimizeAll(self, options: [.voiceOver, .dynamicType, .colorContrast])
         
         // Optimize a specific view
         if let specialView = view.viewWithTag(100) {
-            a11y.optimizeColorContrast(for: specialView)
+            a11y.optimize(specialView, options: .colorContrast)
         }
         
         // Generate an accessibility report
@@ -80,7 +92,7 @@ class MyViewController: UIViewController {
         print(report)
         
         // Perform an accessibility audit
-        let issues = a11y.performAccessibilityAudit(on: self)
+        let issues = a11y.auditAll(self)
         print("Found \(issues.count) accessibility issues")
         
         // Undo last optimization

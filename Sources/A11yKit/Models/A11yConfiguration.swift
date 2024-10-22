@@ -16,6 +16,7 @@ public struct A11yConfiguration {
     public var logLevel: LogLevel = .info
     
     // MARK: - VoiceOver Settings
+    public var enableVoiceOverOptimization: Bool = true
     public var autoGenerateVoiceOverLabels: Bool = true
     public var voiceOverLabelPrefix: String = ""
     public var voiceOverLabelSuffix: String = ""
@@ -25,7 +26,7 @@ public struct A11yConfiguration {
     public var minimumContentSizeCategory: UIContentSizeCategory = .small
     public var maximumContentSizeCategory: UIContentSizeCategory = .accessibilityExtraExtraExtraLarge
     public var enableLargeContentViewer: Bool = true
-    public var preferredContentSizeCategory: UIContentSizeCategory? = nil
+    public var preferredContentSizeCategory: UIContentSizeCategory?
     
     // MARK: - Color Contrast Settings
     public var enableColorContrastOptimization: Bool = true
@@ -34,12 +35,23 @@ public struct A11yConfiguration {
             minimumContrastRatio = max(1.0, min(minimumContrastRatio, 21.0))
             preferredContrastRatio = max(preferredContrastRatio, minimumContrastRatio)
         }
-    } // WCAG AA standard
+    }
     public var preferredContrastRatio: CGFloat = 7.0 {
         didSet {
             preferredContrastRatio = max(minimumContrastRatio, min(preferredContrastRatio, 21.0))
         }
-    } // WCAG AAA standard
+    }
+    
+    // MARK: - Exclude Classes
+    public var autoExcludedClassPrefixes: Set<String> = [
+        "_UI",
+        "UIInputWindow",
+        "UIRemoteKeyboardWindow",
+        "UITextEffectsWindow",
+        "UIStatusBar",
+        "UITransitionView",
+        "UIKeyboard"
+    ]
     
     // MARK: - Custom Settings
     public var customSettings: [String: Any] = [:]
@@ -65,6 +77,20 @@ public struct A11yConfiguration {
     public mutating func reset() {
         self = A11yConfiguration()
     }
+    
+    // MARK: - New Methods
+    
+    public func isContentSizeCategoryAllowed(_ category: UIContentSizeCategory) -> Bool {
+        return category >= minimumContentSizeCategory && category <= maximumContentSizeCategory
+    }
+    
+    public mutating func setContentSizeCategory(_ category: UIContentSizeCategory?) {
+        if let category = category, isContentSizeCategoryAllowed(category) {
+            preferredContentSizeCategory = category
+        } else {
+            preferredContentSizeCategory = nil
+        }
+    }
 }
 
 extension A11yConfiguration: CustomStringConvertible {
@@ -73,11 +99,13 @@ extension A11yConfiguration: CustomStringConvertible {
         A11yConfiguration:
         - Enabled: \(isEnabled)
         - Log Level: \(logLevel)
+        - Enable VoiceOver Optimization: \(enableVoiceOverOptimization)
         - Auto Generate VoiceOver Labels: \(autoGenerateVoiceOverLabels)
         - Enable Dynamic Type: \(enableDynamicType)
         - Preferred Content Size Category: \(preferredContentSizeCategory?.rawValue ?? "nil")
         - Enable Color Contrast Optimization: \(enableColorContrastOptimization)
         - Minimum Contrast Ratio: \(minimumContrastRatio)
+        - Preferred Contrast Ratio: \(preferredContrastRatio)
         - Custom Settings: \(customSettings)
         """
     }

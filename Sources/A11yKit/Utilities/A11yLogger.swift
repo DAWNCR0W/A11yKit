@@ -7,11 +7,15 @@
 
 import Foundation
 
-public enum LogLevel: Int {
+public enum LogLevel: Int, Comparable {
     case debug = 0
     case info
     case warning
     case error
+    
+    public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
 }
 
 @MainActor
@@ -22,7 +26,7 @@ public class A11yLogger {
     private init() {}
     
     public static func log(_ message: String, level: LogLevel, file: String = #file, function: String = #function, line: Int = #line) {
-        guard isEnabled && level.rawValue >= minimumLogLevel.rawValue else { return }
+        guard isEnabled && level >= minimumLogLevel else { return }
         
         let fileName = (file as NSString).lastPathComponent
         let logMessage = "A11yKit [\(level)] [\(fileName):\(line)] \(function): \(message)"

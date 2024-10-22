@@ -8,15 +8,26 @@
 import UIKit
 
 @MainActor
-class DynamicTypeOptimizer {
+class DynamicTypeOptimizer: @preconcurrency Optimizer {
+    
+    // MARK: - Properties
+    
+    private let defaultTextStyle: UIFont.TextStyle = .body
+    
+    // MARK: - Optimizer Protocol
     
     func optimize(_ view: UIView, with configuration: A11yConfiguration) {
+        guard configuration.enableDynamicType else { return }
+        guard view.shouldPerformAccessibilityOptimization(with: configuration) else { return }
+        
         optimizeView(view, with: configuration)
         
         for subview in view.subviews {
             optimize(subview, with: configuration)
         }
     }
+    
+    // MARK: - Private Methods
     
     private func optimizeView(_ view: UIView, with configuration: A11yConfiguration) {
         switch view {
@@ -43,17 +54,7 @@ class DynamicTypeOptimizer {
     
     private func optimizeLabel(_ label: UILabel, with configuration: A11yConfiguration) {
         label.adjustsFontForContentSizeCategory = true
-        
-        if let customFont = label.font {
-            if let textStyle = customFont.fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle {
-                label.font = UIFont.preferredFont(forTextStyle: textStyle)
-            } else {
-                let newFont = UIFont(descriptor: customFont.fontDescriptor, size: 0)
-                label.font = UIFontMetrics.default.scaledFont(for: newFont)
-            }
-        } else {
-            label.font = UIFont.preferredFont(forTextStyle: .body)
-        }
+        label.font = scaledFont(for: label.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             label.showsLargeContentViewer = true
@@ -62,10 +63,8 @@ class DynamicTypeOptimizer {
     
     private func optimizeButton(_ button: UIButton, with configuration: A11yConfiguration) {
         button.titleLabel?.adjustsFontForContentSizeCategory = true
-        if let customFont = button.titleLabel?.font {
-            button.titleLabel?.font = UIFontMetrics.default.scaledFont(for: customFont)
-        } else {
-            button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
+        if let titleFont = button.titleLabel?.font {
+            button.titleLabel?.font = scaledFont(for: titleFont, textStyle: .body, configuration: configuration)
         }
         
         if configuration.enableLargeContentViewer {
@@ -75,19 +74,7 @@ class DynamicTypeOptimizer {
     
     private func optimizeTextField(_ textField: UITextField, with configuration: A11yConfiguration) {
         textField.adjustsFontForContentSizeCategory = true
-        
-        if let customFont = textField.font {
-            let fontDescriptor = customFont.fontDescriptor
-            let textStyle: UIFont.TextStyle = fontDescriptor.object(forKey: .textStyle) as? UIFont.TextStyle ?? .body
-            
-            if let styleDescriptor = fontDescriptor.withDesign(.default)?.withSymbolicTraits(fontDescriptor.symbolicTraits) {
-                textField.font = UIFont(descriptor: styleDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
-            } else {
-                textField.font = UIFont(descriptor: fontDescriptor, size: UIFont.preferredFont(forTextStyle: textStyle).pointSize)
-            }
-        } else {
-            textField.font = UIFont.preferredFont(forTextStyle: .body)
-        }
+        textField.font = scaledFont(for: textField.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             textField.showsLargeContentViewer = true
@@ -96,12 +83,7 @@ class DynamicTypeOptimizer {
     
     private func optimizeTextView(_ textView: UITextView, with configuration: A11yConfiguration) {
         textView.adjustsFontForContentSizeCategory = true
-        
-        if let customFont = textView.font {
-            textView.font = UIFontMetrics.default.scaledFont(for: customFont)
-        } else {
-            textView.font = UIFont.preferredFont(forTextStyle: .body)
-        }
+        textView.font = scaledFont(for: textView.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             textView.showsLargeContentViewer = true
@@ -113,12 +95,12 @@ class DynamicTypeOptimizer {
         let selectedAttributes = segmentedControl.titleTextAttributes(for: .selected) ?? [:]
         
         if let font = defaultAttributes[.font] as? UIFont {
-            let scaledFont = UIFontMetrics.default.scaledFont(for: font)
+            let scaledFont = scaledFont(for: font, textStyle: .body, configuration: configuration)
             segmentedControl.setTitleTextAttributes([.font: scaledFont], for: .normal)
         }
         
         if let font = selectedAttributes[.font] as? UIFont {
-            let scaledFont = UIFontMetrics.default.scaledFont(for: font)
+            let scaledFont = scaledFont(for: font, textStyle: .body, configuration: configuration)
             segmentedControl.setTitleTextAttributes([.font: scaledFont], for: .selected)
         }
         
@@ -148,12 +130,7 @@ class DynamicTypeOptimizer {
     
     private func optimizeSearchBar(_ searchBar: UISearchBar, with configuration: A11yConfiguration) {
         searchBar.searchTextField.adjustsFontForContentSizeCategory = true
-        
-        if let customFont = searchBar.searchTextField.font {
-            searchBar.searchTextField.font = UIFontMetrics.default.scaledFont(for: customFont)
-        } else {
-            searchBar.searchTextField.font = UIFont.preferredFont(forTextStyle: .body)
-        }
+        searchBar.searchTextField.font = scaledFont(for: searchBar.searchTextField.font, textStyle: .body, configuration: configuration)
         
         if configuration.enableLargeContentViewer {
             searchBar.showsLargeContentViewer = true
@@ -166,50 +143,20 @@ class DynamicTypeOptimizer {
         }
     }
     
-    func audit(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
-            var issues: [A11yIssue] = []
-            
-            issues.append(contentsOf: auditView(view, with: configuration))
-            
-            for subview in view.subviews {
-                issues.append(contentsOf: audit(subview, with: configuration))
-            }
-            
-            return issues
+    private func scaledFont(for font: UIFont?, textStyle: UIFont.TextStyle, configuration: A11yConfiguration) -> UIFont {
+        guard let font = font else {
+            return UIFont.preferredFont(forTextStyle: textStyle)
         }
         
-        private func auditView(_ view: UIView, with configuration: A11yConfiguration) -> [A11yIssue] {
-            var issues: [A11yIssue] = []
-            
-            switch view {
-            case let label as UILabel:
-                if !label.adjustsFontForContentSizeCategory {
-                    issues.append(A11yIssue(view: label, issueType: .dynamicType, description: "Label not adjusted for Dynamic Type"))
-                }
-            case let button as UIButton:
-                if !(button.titleLabel?.adjustsFontForContentSizeCategory ?? false) {
-                    issues.append(A11yIssue(view: button, issueType: .dynamicType, description: "Button title not adjusted for Dynamic Type"))
-                }
-            case let textField as UITextField:
-                if !textField.adjustsFontForContentSizeCategory {
-                    issues.append(A11yIssue(view: textField, issueType: .dynamicType, description: "TextField not adjusted for Dynamic Type"))
-                }
-            case let textView as UITextView:
-                if !textView.adjustsFontForContentSizeCategory {
-                    issues.append(A11yIssue(view: textView, issueType: .dynamicType, description: "TextView not adjusted for Dynamic Type"))
-                }
-            case let searchBar as UISearchBar:
-                if !searchBar.searchTextField.adjustsFontForContentSizeCategory {
-                    issues.append(A11yIssue(view: searchBar, issueType: .dynamicType, description: "SearchBar not adjusted for Dynamic Type"))
-                }
-            default:
-                break
-            }
-            
-            if configuration.enableLargeContentViewer && !view.showsLargeContentViewer {
-                issues.append(A11yIssue(view: view, issueType: .dynamicType, description: "Large Content Viewer not enabled"))
-            }
-            
-            return issues
+        guard font.fontDescriptor.symbolicTraits.contains(.traitUIOptimized) else {
+            return font
         }
+        
+        if let preferredCategory = configuration.preferredContentSizeCategory {
+            let traitCollection = UITraitCollection(preferredContentSizeCategory: preferredCategory)
+            return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: font, compatibleWith: traitCollection)
+        }
+        
+        return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: font)
+    }
 }

@@ -26,7 +26,7 @@ public extension UITextField {
         guard let textColor = textColor,
               let backgroundColor = backgroundColor ?? superview?.backgroundColor else { return }
         
-        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio ?? 4.5 // WCAG AA
+        let minimumContrastRatio = A11yKit.shared.configuration.minimumContrastRatio // WCAG AA
         let currentContrast = textColor.contrastRatio(with: backgroundColor)
         if currentContrast < minimumContrastRatio {
             self.textColor = textColor.adjustedForContrast(against: backgroundColor, targetContrast: minimumContrastRatio)
